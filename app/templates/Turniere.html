@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}
+	SG-Witten Turniere
+{% endblock %}
+{% block body %}
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th scope="col">Datum</th>
+            <th scope="col">Turnier</th>
+        </tr>
+        {% for cup in cups %}
+        	<tr>
+                <td>{{ cup.date.strftime("%d.%m.%Y") }}</td>
+                <td>{{ cup.name }}</td>
+            </tr>
+        {% endfor %}
+
+    </table>
+{% endblock %}
