@@ -29,7 +29,10 @@ Press CTRL+C to quit
  * Debugger PIN: 701-602-878
  * 
 ```
-Now you can navigate to [localhost:5000](localhost:5000) in your browser and explore the website.
+Now you can navigate to [localhost:5000](http://localhost:5000) in your browser and explore the website.
+If something else shows up, close whatever process is occupying localhost:5000 and try again.
+Or change the target port by changing the port keyword for the `app.run(debug=True, host=127.0.0.1, port=5000)` function call to something else, like 8000.
+Then navigate to localhost:port
 
 ### Windows
 Install Python from [python.org](https://www.python.org/)
@@ -50,4 +53,7 @@ Press CTRL+C to quit
  * 
 ```
 
-You can now head to [localhost:5000](localhost:5000) on your maschine to explore the website.
+You can now head to [localhost:5000](http://localhost:5000) on your maschine to explore the website.
+If something else shows up, close whatever process is occupying localhost:5000 and try again.
+Or change the target port by changing the port keyword for the `app.run(debug=True, host=127.0.0.1, port=5000)` function call to something else, like 8000.
+Then navigate to localhost:port
