@@ -20,9 +20,6 @@ login_manager = LoginManager(app)
 from app.models import *
 from app.routes import *
 
-if __name__ == '__main__':
-    app.run(debug=True, host="127.0.0.1", port=5000)
-
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
