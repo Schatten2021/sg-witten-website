@@ -1,2 +1,5 @@
 /instance/
 /migrations/
+/.venv/
+/.idea/
+/app/__pycache__/

@@ -16,30 +16,51 @@
     <body>
     <div id="nav">
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
-            <a class="navbar-brand" href="/"><img src="/static/img/Logo.png" alt="SG-Witten Logo (Home)" style="height: inherit"> </a>
+            <a class="navbar-brand" href="/index"><img src="/static/img/Logo.png" alt="SG-Witten Logo (Home)" style="height: 12vh;"> </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navbar">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbar">
                 <ul class="navbar-nav me-auto mb-2 mg-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/Turniere">Vereinsturniere</a>
+                    <li class="nav-item dropdown">
+                        <button class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Turniere
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/Turniere">Alle</a></li>
+                            <li><a class="dropdown-item" href="/SparkassenJugendOpen">Sparkassen Jugend Open</a></li>
+                            <li><a class="dropdown-item" href="/">Vereinsturniere</a></li>
+                            <li><a class="dropdown-item" href="/">Stadtmeisterschaften</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Mannschaftsbetrieb</a>
+                        <a class="nav-link" href="/">Mannschaftsbetrieb</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Stadtmeisterschaften</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Sparkassen Open</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Vorstand</a>
+                        <a class="nav-link" href="/">Vorstand</a>
                     </li>
                 </ul>
             </div>
+            <a href="/login">
+                <i class="fa-solid fa-user fa-2xl" style="color: #ffffff; font-size: 8vh"></i>
+            </a>
         </nav>
+    </div>
+    <div id="messages">
+    {% if url is undefined %}
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                	<div class="alert alert-info alert-dismissible" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+
+        	{% endif %}
+        {% endwith %}
+    {% endif %}
+        
     </div>
     <div id="content">
         {% block body %}

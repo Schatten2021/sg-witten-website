@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block body %}
+	<h1>Erstelle einen Account</h1>
+    <form method="post">
+        <label class="form-label" for="email">
+            Email:
+        </label>
+        <input type="email" class="form-control" name="email" id="email" required>
+        <label class="form-label" for="password">
+            Password:
+        </label>
+        <input type="password" id="password" class="form-control" name="password" required>
+        <label class="form-label" for="Nachname">
+            Nachname:
+        </label>
+        <input type="text" class="form-control" name="name" id="Nachname" required>
+        <label class="form-label" for="Vorname">
+            Vorname:
+        </label>
+        <input type="text" class="form-control" name="surname" id="Vorname" required>
+        <input type="submit" class="btn btn-primary" value="Login">
+    </form>
+
+    <a href="/signup">
+    Noch kein Account?
+    </a>
+{% endblock %}
