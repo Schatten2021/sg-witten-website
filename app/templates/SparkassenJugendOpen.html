@@ -4,11 +4,21 @@
     {% for cup in cups %}
     	<section>
             <h2>{{ cup.year }}</h2>
+            <p>
+                {{ cup.article.replace("\n", "</p><p>")|safe }}
+            <!-- TODO: pls remove the |safe tag. This could be used for xss! -->
+            </p>
+            <br>
+            <p>
+                Die besten Wittener Schüler in den einzelnen Jahrgangsstufen waren:
+            </p>
+            <ul>
+                {% for victor in cup.victors|sort(attribute="Jahrgang") %}
+                	U {{ victor.Jahrgang }}: {{ victor.name }} ({{ victor.school }})
+                {% endfor %}
+
+            </ul>
         </section>
-        <p>
-            {{ cup.article.replace("\n", "</p><p>")|safe }}
-        <!-- TODO: pls remove the |safe tag. This could be used for xss! -->
-        </p>
 
     {% endfor %}
 

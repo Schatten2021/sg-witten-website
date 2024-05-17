@@ -1,7 +1,7 @@
 from app import app, db
 from flask import render_template, flash, url_for, request, make_response
 from flask_login import current_user, login_required, login_user, logout_user
-from app.models import SparkassenJugendOpen, Turnier, User
+from app.models import SparkassenJugendOpen, Turnier, User, Vorstand
 
 
 def redirect(url, code: int = 301):
@@ -31,6 +31,12 @@ def turniere():
 def sparkassen_jugend_open():
     cups: list[SparkassenJugendOpen] = SparkassenJugendOpen.query.all()
     return render_template("SparkassenJugendOpen.html", cups=cups)
+
+
+@app.route("/Vorstand")
+def vorstand():
+    members: list[Vorstand] = Vorstand.query.all()
+    return render_template("Vorstand.html", members=members)
 
 
 @app.route("/login", methods=['GET', 'POST'])

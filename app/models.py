@@ -17,7 +17,7 @@ class SparkassenJugendOpen(db.Model):
     year: Mapped[int] = db.Column(db.Integer)
     title: Mapped[str] = db.Column(db.String)
     article: Mapped[str] = db.Column(db.String)
-    victors: Mapped["SparkassenJugendOpenVictors"] = relationship()
+    victors: Mapped[list["SparkassenJugendOpenVictors"]] = relationship()
 
 
 class SparkassenJugendOpenVictors(db.Model):
@@ -27,6 +27,7 @@ class SparkassenJugendOpenVictors(db.Model):
     school: Mapped[str] = db.Column(db.String)
     cup_id: Mapped[int] = db.Column(db.ForeignKey("sparkassen_jugend_open.id"))
     cup: Mapped[SparkassenJugendOpen] = relationship()
+
 
 class User(db.Model):
     id: Mapped[int] = db.Column(db.Integer, primary_key=True)
@@ -47,3 +48,10 @@ class User(db.Model):
 
     def get_id(self):
         return self.id
+
+
+class Vorstand(db.Model):
+    id: Mapped[int] = db.Column(db.Integer, primary_key=True)
+    name: Mapped[str] = db.Column(db.String)
+    title: Mapped[str] = db.Column(db.String)
+    mail: Mapped[str] = db.Column(db.String)

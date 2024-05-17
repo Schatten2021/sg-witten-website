@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block body %}
+	<h1>Vorstand</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Titel</th>
+                <th scope="col">Name</th>
+                <th scope="col">E-Mail</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for member in members %}
+        	<tr>
+                <td>{{ member.title }}</td>
+                <td>{{ member.name }}</td>
+                <td><a href="mailto:{{ member.mail }}">{{ member.mail }}</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
