@@ -6,7 +6,7 @@
             <h2>{{ cup.year }}</h2>
             <p>
                 {{ cup.article.replace("\n", "</p><p>")|safe }}
-            <!-- TODO: pls remove the |safe tag. This could be used for xss! -->
+                {# TODO: pls remove the |safe tag. This could be used for xss! #}
             </p>
             <br>
             <p>

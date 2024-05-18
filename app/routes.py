@@ -1,7 +1,7 @@
 from app import app, db
 from flask import render_template, flash, url_for, request, make_response
 from flask_login import current_user, login_required, login_user, logout_user
-from app.models import SparkassenJugendOpen, Turnier, User, Vorstand
+from app.models import SparkassenJugendOpen, Turnier, User, Vorstand, Team
 
 
 def redirect(url, code: int = 301):
@@ -48,6 +48,11 @@ def vorstand():
 @app.route("/Impressum")
 def impressum():
     return render_template("Impressum.html")
+
+
+@app.route("/Mannschaftsbetrieb")
+def mannschaftsbetrieb():
+    return render_template("Mannschaftsbetrieb.html", teams=Team.query.all())
 
 
 @app.route("/login", methods=['GET', 'POST'])

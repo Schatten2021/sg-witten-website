@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block body %}
+	<h1>Mannschaftsbetrieb Saison 2023/24</h1>
+    {% for team in teams %}
+    	<h2>SG Witten {{ team.id }}</h2>
+        <ul style="list-style: none; margin-left: 0; padding-left: 1em; text-indent: -1em;"></ul>
+        {% for player in team.players|sort %}
+            <ul{% if player.is_reserve %} class="text-body-secondary"{% endif %}>{{ player.board_number }} {{ player.name }}</ul>
+        {% endfor %}
+    {% endfor %}
+
+{% endblock %}
