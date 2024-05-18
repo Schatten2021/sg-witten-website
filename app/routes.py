@@ -15,6 +15,12 @@ def not_found(*_):
     return render_template('404.html'), 404
 
 
+@app.before_request
+def before_request():
+    if app.debug and request.endpoint != "static":
+        flash(f"This is a personal remake of the official SG-Witten Website (<a href=\"https://schachgesellschaft-witten.de/\">original</a>)", "warning")
+
+
 @app.route('/')
 @app.route('/index')
 def index():
@@ -39,25 +45,30 @@ def vorstand():
     return render_template("Vorstand.html", members=members)
 
 
+@app.route("/Impressum")
+def impressum():
+    return render_template("Impressum.html")
+
+
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
         return render_template("login.html")
     if "email" not in request.form or "password" not in request.form:
-        flash("Email und Passwort werden Benötigt!")
+        flash("Email und Passwort werden Benötigt!", "error")
         return render_template("login.html")
     email = request.form["email"]
     password = request.form["password"]
     user: list[User] = User.query.filter_by(email=email).all()
     if len(user) != 1:
-        flash("Ungültige E-Mail-Adresse oder Password")
+        flash("Ungültige E-Mail-Adresse oder Password", "error")
         return render_template("login.html")
     user: User = user[0]
     if not user.check_password(password):
-        flash("Ungültige E-Mail-Adresse oder Password")
+        flash("Ungültige E-Mail-Adresse oder Password", "error")
         return render_template("login.html")
     login_user(user)
-    flash("Login erfolgreich!")
+    flash("Login erfolgreich!", "success")
     return redirect(url_for('index'))
 
 

@@ -1,0 +1,9 @@
+html, body {
+    height: 100%;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+}
+#content {
+    flex: 1;
+}

@@ -12,6 +12,7 @@
         {% block head %}
 
         {% endblock %}
+    <link rel="stylesheet" href="/static/css/base.css">
     </head>
     <body>
     <div id="nav">
@@ -21,7 +22,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbar">
-                <ul class="navbar-nav me-auto mb-2 mg-lg-0">
+                <ul class="navbar-nav me-auto mb-2 mg-lg-0 nav-fill w-100">
                     <li class="nav-item dropdown">
                         <button class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                             Turniere
@@ -40,21 +41,28 @@
                         <a class="nav-link" href="/Vorstand">Vorstand</a>
                     </li>
                 </ul>
+                <a href="/login">
+                    <i class="fa-solid fa-user btn fs-1" role="button" style="color: #ffffff;"></i>
+                </a>
             </div>
-            <a href="/login">
-                <i class="fa-solid fa-user fa-2xl" style="color: #ffffff; font-size: 8vh"></i>
-            </a>
         </nav>
     </div>
     <div id="messages">
     {% if url is undefined %}
-        {% with messages = get_flashed_messages() %}
+        {% with messages = get_flashed_messages(with_categories=True) %}
             {% if messages %}
-                {% for message in messages %}
-                	<div class="alert alert-info alert-dismissible" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
+                {% for category, message in messages %}
+                    {% if category not in ["success", "warning", "error", "info"] %}
+                        <div class="alert alert-info alert-dismissible" role="alert">
+                            {{ message|safe }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+                        {{ message|safe }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
                 {% endfor %}
 
         	{% endif %}
@@ -67,6 +75,12 @@
 
         {% endblock %}
     </div>
+    <footer class="bg-body-tertiary">
+        <nav class="nav">
+            <a href="/Impressum" class="nav-link">Impressum</a>
+            <a href="/privacy-policy" class="nav-link">Datenschutzerkl&auml;rung</a>
+        </nav>
+    </footer>
     <div id="scripts">
         {% block javascript %}
 
