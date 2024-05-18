@@ -76,9 +76,19 @@
         {% endblock %}
     </div>
     <footer class="bg-body-tertiary">
-        <nav class="nav">
-            <a href="/Impressum" class="nav-link">Impressum</a>
-            <a href="/privacy-policy" class="nav-link">Datenschutzerkl&auml;rung</a>
+        <nav class="nav" style="min-height: 200px">
+            <div class="flex-column">
+                <a href="/Impressum" class="nav-link">Impressum</a>
+                <a href="/privacy-policy" class="nav-link">Datenschutzerkl&auml;rung</a>
+            </div>
+            <iframe
+                    style="position: absolute; right: 0;"
+                    height="200"
+                    src="https://maps.google.com/maps?q=Ardeystra%C3%9Fe%2020%20Witten&amp;t=m&amp;z=17&amp;output=embed&amp;iwloc=near"
+                    title="Ardeystraße 20 Witten"
+                    aria-label="Ardeystraße 20 Witten"
+                    allowfullscreen
+            ></iframe>
         </nav>
     </footer>
     <div id="scripts">

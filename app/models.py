@@ -90,7 +90,7 @@ class Player(db.Model):
     @property
     def board_number(self) -> int:
         if self.is_reserve:
-            return 1001 + self.index_in_team - self.team.boards
+            return 1_000 + self.index_in_team - self.team.boards + 1
         return self.index_in_team + 1  # since 0 index and it should be displayed as 1 index.
 
     def __lt__(self, other: "Player") -> bool:
