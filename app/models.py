@@ -17,7 +17,7 @@ class SparkassenJugendOpen(db.Model):
     year: Mapped[int] = db.Column(db.Integer)
     title: Mapped[str] = db.Column(db.String)
     article: Mapped[str] = db.Column(db.String)
-    victors: Mapped[list["SparkassenJugendOpenVictors"]] = relationship()
+    victors: Mapped[list["SparkassenJugendOpenVictors"]] = relationship(back_populates="cup")
 
 
 class SparkassenJugendOpenVictors(db.Model):
@@ -26,7 +26,7 @@ class SparkassenJugendOpenVictors(db.Model):
     Jahrgang: Mapped[int] = db.Column(db.Integer)
     school: Mapped[str] = db.Column(db.String)
     cup_id: Mapped[int] = db.Column(db.ForeignKey("sparkassen_jugend_open.id"))
-    cup: Mapped[SparkassenJugendOpen] = relationship()
+    cup: Mapped[SparkassenJugendOpen] = relationship(back_populates="victors")
 
 
 class User(db.Model):
@@ -60,7 +60,7 @@ class Vorstand(db.Model):
 class Team(db.Model):
     id: Mapped[int] = db.Column(db.Integer, primary_key=True)
     boards: Mapped[int] = db.Column(db.Integer)
-    players: Mapped[list["Player"]] = relationship()
+    players: Mapped[list["Player"]] = relationship(back_populates="team")
 
     @property
     def main_players(self) -> list["Player"]:
@@ -77,7 +77,7 @@ class Player(db.Model):
     surname: Mapped[str] = db.Column(db.String)
     position_in_team: Mapped[int] = db.Column(db.Integer)
     team_id: Mapped[int] = db.Column(db.ForeignKey("team.id"))
-    team: Mapped[Team] = relationship()
+    team: Mapped[Team] = relationship(back_populates="players")
 
     @property
     def index_in_team(self) -> int:

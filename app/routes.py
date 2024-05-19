@@ -1,7 +1,8 @@
-from app import app, db
+from app import app, db, mail
 from flask import render_template, flash, url_for, request, make_response
 from flask_login import current_user, login_required, login_user, logout_user
 from app.models import SparkassenJugendOpen, Turnier, User, Vorstand, Team
+from flask_mail import Message
 
 
 def redirect(url, code: int = 301):

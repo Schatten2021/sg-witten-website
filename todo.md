@@ -19,6 +19,7 @@ Pages that are still left to be done
       - Name
       - Verein
       - Punkte
+- Email verification upon login/sign up
 
 Pages/Things that could still be done
 ---
