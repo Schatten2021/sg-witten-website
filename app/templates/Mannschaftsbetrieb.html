@@ -3,9 +3,9 @@
 	<h1>Mannschaftsbetrieb Saison 2023/24</h1>
     {% for team in teams %}
     	<h2>SG Witten {{ team.id }}</h2>
-        <ul style="list-style: none; margin-left: 0; padding-left: 1em; text-indent: -1em;"></ul>
+        <ul style="list-style: none;"></ul>
         {% for player in team.players|sort %}
-            <ul{% if player.is_reserve %} class="text-body-secondary"{% endif %}>{{ player.board_number }} {{ player.name }}</ul>
+            <ul{% if player.is_reserve %} class="text-body-secondary"{% endif %}>{% if player.is_reserve %}Ersatz {{ player.index_in_team + 1 - player.team.boards}}{% else %}{{ player.index_in_team + 1 }}{% endif %} {{ player.name }}</ul>
         {% endfor %}
     {% endfor %}
 
