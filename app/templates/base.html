@@ -17,32 +17,32 @@
     <body>
     <div id="nav">
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
-            <a class="navbar-brand" href="/index"><img src="/static/img/Logo.png" alt="SG-Witten Logo (Home)" style="height: 12vh;"> </a>
+            <a class="navbar-brand{% if request.endpoint == "index" %} active{% endif %}" href="/index"><img src="/static/img/Logo.png" alt="SG-Witten Logo (Home)" style="height: 12vh;"> </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navbar">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbar">
                 <ul class="navbar-nav me-auto mb-2 mg-lg-0 nav-fill w-100">
                     <li class="nav-item dropdown">
-                        <button class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="nav-link dropdown-toggle{% if request.endpoint in ["turniere", "sparkassen_jugend_open", "vereinsturniere", "stadtmeisterschaften"] %} active{% endif %}" data-bs-toggle="dropdown" aria-expanded="false">
                             Turniere
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/Turniere">Alle</a></li>
-                            <li><a class="dropdown-item" href="/SparkassenJugendOpen">Sparkassen Jugend Open</a></li>
-                            <li><a class="dropdown-item" href="/">Vereinsturniere</a></li>
-                            <li><a class="dropdown-item" href="/">Stadtmeisterschaften</a></li>
+                            <li><a class="dropdown-item{% if request.endpoint == "turniere" %} active{% endif %}" href="/Turniere">Alle</a></li>
+                            <li><a class="dropdown-item{% if request.endpoint == "sparkassen_jugend_open" %} active{% endif %}" href="/SparkassenJugendOpen">Sparkassen Jugend Open</a></li>
+                            <li><a class="dropdown-item{% if request.endpoint == "vereinsturniere" %} active{% endif %}" href="/Vereinsturniere">Vereinsturniere</a></li>
+                            <li><a class="dropdown-item{% if request.endpoint == "stadtmeisterschaften" %} active{% endif %}" href="/Stadtmeisterschaften">Stadtmeisterschaften</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/Mannschaftsbetrieb">Mannschaftsbetrieb</a>
+                        <a class="nav-link{% if request.endpoint == 'mannschaftsbetrieb' %} active{% endif %}" href="/Mannschaftsbetrieb">Mannschaftsbetrieb</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/Vorstand">Vorstand</a>
+                        <a class="nav-link{% if request.endpoint == 'vorstand' %} active{% endif %}" href="/Vorstand">Vorstand</a>
                     </li>
                 </ul>
                 <a href="/login">
-                    <i class="fa-solid fa-user btn fs-1" role="button" style="color: #ffffff;"></i>
+                    <i class="fa-solid fa-user btn fs-1{% if request.endpoint in ["login", "signup"] %} active{% endif %}" role="button" style="color: #ffffff;"></i>
                 </a>
             </div>
         </nav>

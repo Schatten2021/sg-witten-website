@@ -56,6 +56,16 @@ def mannschaftsbetrieb():
     return render_template("Mannschaftsbetrieb.html", teams=Team.query.all())
 
 
+@app.route("/Vereinsturniere")
+def vereinsturniere():
+    return render_template("404.html"), 404
+
+
+@app.route("/Stadtmeisterschaften")
+def stadtmeisterschaften():
+    return render_template("404.html"), 404
+
+
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
