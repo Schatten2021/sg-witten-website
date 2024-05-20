@@ -1,8 +1,9 @@
+import logging
 from datetime import datetime
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import Mapped, relationship
-
+from sqlalchemy import or_
 from app import db
 
 
@@ -97,3 +98,78 @@ class Player(db.Model):
         if not isinstance(other, Player):
             raise TypeError(f"other must be of type Player but was of type {type(other)}")
         return self.position_in_team < other.position_in_team
+
+
+class Stadtmeisterschaft(db.Model):
+    id: Mapped[int] = db.Column(db.Integer, primary_key=True)
+    year: Mapped[int] = db.Column(db.Integer)
+    title: Mapped[str] = db.Column(db.String)
+    teilnehmer: Mapped[list["StadtmeisterschaftTeilnehmer"]] = relationship(back_populates="meisterschaft")
+
+    @property
+    def teilnehmer_liste(self) -> list["StadtmeisterschaftTeilnehmer"]:
+        return sorted(self.teilnehmer, key=lambda x: x.rank)
+
+
+class StadtmeisterschaftTeilnehmer(db.Model):
+    id: Mapped[int] = db.Column(db.Integer, primary_key=True)
+    name: Mapped[str] = db.Column(db.String)
+    surname: Mapped[str] = db.Column(db.String)
+    rank: Mapped[int] = db.Column(db.Integer)
+    team: Mapped[str] = db.Column(db.String)
+    DWZ: Mapped[int] = db.Column(db.Integer)
+    points: Mapped[float] = db.Column(db.Float)
+    Buchholz: Mapped[float] = db.Column(db.Float)
+    meisterschaft_id: Mapped[int] = db.Column(db.ForeignKey("stadtmeisterschaft.id"))
+    meisterschaft: Mapped[Stadtmeisterschaft] = relationship(back_populates="teilnehmer")
+    anzahl_spielfrei: Mapped[int] = db.Column(db.Integer)
+
+    @property
+    def played_games(self) -> list["StadtmeisterschaftSpiel"]:
+        return StadtmeisterschaftSpiel.query.filter(or_(StadtmeisterschaftSpiel.player_1_id == self.id,
+                                                        StadtmeisterschaftSpiel.player_2_id == self.id)).all()
+
+    @property
+    def results(self) -> list[tuple[str | None, str]]:
+        played_games = self.played_games
+        players = self.meisterschaft.teilnehmer_liste
+        res: list[tuple[str | None, str]] = []
+        for player in players:
+            if player == self:
+                res.append(("#00F", "X"))
+                continue
+            found: bool = False
+            for game in played_games:
+                if not game.is_player(player):
+                    continue
+                game_result = game.result if game.player_1_id == self.id else -game.result
+                found = True
+                match game_result:
+                    case 0:
+                        res.append(("#990", "½"))
+                    case 1:
+                        res.append(("#090", "1"))
+                    case 2:
+                        res.append(("#0F0", "+"))
+                    case -1:
+                        res.append(("#900", "0"))
+                    case -2:
+                        res.append(("#F00", "-"))
+                    case _:
+                        logging.error(f"Unexpected result {game_result}")
+                        res.append(("#000", "?"))
+                break
+            if not found:
+                res.append((None, ""))
+        res.append(("#0A0" if self.anzahl_spielfrei > 0 else None, "+" * self.anzahl_spielfrei))
+        return res
+
+
+class StadtmeisterschaftSpiel(db.Model):
+    id: Mapped[int] = db.Column(db.Integer, primary_key=True)
+    player_1_id: Mapped[int] = db.Column(db.ForeignKey("stadtmeisterschaft_teilnehmer.id"))
+    player_2_id: Mapped[int] = db.Column(db.ForeignKey("stadtmeisterschaft_teilnehmer.id"))
+    result: Mapped[int] = db.Column(db.Integer)
+
+    def is_player(self, player: StadtmeisterschaftTeilnehmer) -> bool:
+        return self.player_1_id == player.id or self.player_2_id == player.id

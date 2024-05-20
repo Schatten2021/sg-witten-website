@@ -1,0 +1,67 @@
+{% extends "Flask internals/base.html" %}
+{% block body %}
+	<h1>Stadtmeisterschaften</h1>
+    {% for cup in cups %}
+    	<h2>{{ cup.title }}</h2>
+        <h3>Teilnehmer</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Rang</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Verein</th>
+                    <th scope="col">DWZ</th>
+                    <th scope="col">Punkte</th>
+                    <th scope="col">Buchholz Wertung</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for teilnehmer in cup.teilnehmer %}
+                	<tr>
+                        <td>{{ teilnehmer.rank }}</td>
+                        <td>{{ teilnehmer.name }}, {{ teilnehmer.surname }}</td>
+                        <td>{{ teilnehmer.team }}</td>
+                        <td>{{ teilnehmer.DWZ }}</td>
+                        <td>{{ teilnehmer.points }}</td>
+                        <td>{{ teilnehmer.Buchholz }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h3>Spiele</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Rang</th>
+                    <th></th>
+                    {% for teilnehmer in cup.teilnehmer %}
+                        <th scope="col">{{ teilnehmer.rank }}</th>
+                    {% endfor %}
+                    <th scope="col" style="writing-mode: vertical-lr; text-orientation: mixed;">Spielfrei</th>
+                    <th scope="col" style="writing-mode: vertical-lr; text-orientation: mixed">Punkte</th>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th class="col">Name</th>
+                    {% for teilnehmer in cup.teilnehmer %}
+                    	<th scope="col" style="writing-mode: vertical-lr; text-orientation: mixed">{{ teilnehmer.name }}, {{ teilnehmer.surname }}</th>
+                    {% endfor %}
+                    <th></th><th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for teilnehmer in cup.teilnehmer %}
+                    <tr>
+                        <th scope="row">{{ teilnehmer.rank }}</th>
+                        <th scope="row">{{ teilnehmer.name }}, {{ teilnehmer.surname }}</th>
+                        {% for col, result_str in teilnehmer.results %}
+                            <td{% if col != None %} style="background-color: {{ col }}" {% endif %}>{{ result_str }}</td>
+                        {% endfor %}
+                        <td>{{ teilnehmer.points }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+
+{% endblock %}

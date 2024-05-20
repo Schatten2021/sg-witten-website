@@ -1,7 +1,7 @@
 from app import app, db, mail
 from flask import render_template, flash, url_for, request, make_response
 from flask_login import current_user, login_required, login_user, logout_user
-from app.models import SparkassenJugendOpen, Turnier, User, Vorstand, Team
+from app.models import SparkassenJugendOpen, Turnier, User, Vorstand, Team, Stadtmeisterschaft
 from flask_mail import Message
 
 
@@ -19,7 +19,7 @@ def not_found(*_):
 @app.before_request
 def before_request():
     if app.debug and request.endpoint != "static":
-        flash(f"This is a personal remake of the official SG-Witten Website (<a href=\"https://schachgesellschaft-witten.de/\">original</a>)", "warning")
+        flash(f"This is a personal remake of the official SG-Witten Website (<a href=\"https://schachgesellschaft-witten.de/\">original</a>). Alle Daten auf dieser Seite sind dem Original entnommen.", "warning")
 
 
 @app.route('/')
@@ -63,7 +63,7 @@ def vereinsturniere():
 
 @app.route("/Stadtmeisterschaften")
 def stadtmeisterschaften():
-    return render_template("Flask internals/404.html"), 404
+    return render_template("Turniere/Stadtmeisterschaften.html", cups=sorted(Stadtmeisterschaft.query.all()), key=lambda x: x.year)
 
 
 @app.route("/login", methods=['GET', 'POST'])

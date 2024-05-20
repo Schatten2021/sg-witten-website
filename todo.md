@@ -2,7 +2,6 @@ Pages that are still left to be done
 ----
 - admin page
 - Vereinspokal
-- Stadtmeisterschaften
 - Kinderschach Verstärkung
 - Sparkassen Open
 - Datenschutzerklärung
@@ -40,3 +39,4 @@ Things that have been done:
 - Account system
 - (Impressum)
 - Generelles Layout
+- Stadtmeisterschaften

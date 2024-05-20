@@ -5,7 +5,7 @@
     	<h2>SG Witten {{ team.id }}</h2>
         <ul style="list-style: none;"></ul>
         {% for player in team.players|sort %}
-            <ul{% if player.is_reserve %} class="text-body-secondary"{% endif %}>{% if player.is_reserve %}Ersatz {{ player.index_in_team + 1 - player.team.boards}}{% else %}{{ player.index_in_team + 1 }}{% endif %} {{ player.name }}</ul>
+            <li{% if player.is_reserve %} class="text-body-secondary"{% endif %}>{% if player.is_reserve %}Ersatz {{ player.index_in_team + 1 - player.team.boards}}{% else %}{{ player.index_in_team + 1 }}{% endif %} {{ player.name }}</li>
         {% endfor %}
     {% endfor %}
 
