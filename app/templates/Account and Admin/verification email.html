@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+    </head>
+    <body>
+        <h1>Verifizieren sie ihre E-Mail</h1>
+        <!-- todo: insert domain -->
+        <h2>Ihre E-Mail Adresse wurde verwendet, um einen Account auf <a href="{{ request.url_root }}">{{ request.url_root }}</a> zu erstellen.</h2>
+        <p>Falls sie das nicht waren, melden sie sich bei den Admins der Seite.</p>
+        <p>Wenn sie das waren, <a href="{{ request.url_root }}verify_email?id={{ authentication_request.id }}">verifizieren sie bitte ihre E-Mail</a>.</p>
+    </body>
+</html>

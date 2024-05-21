@@ -2,3 +2,6 @@
 /.venv/
 /.idea/
 /app/__pycache__/
+/migrations_old/
+/instance_old/
+/.$Database ER.drawio.bkp

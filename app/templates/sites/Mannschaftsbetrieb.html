@@ -1,12 +1,14 @@
-{% extends "Flask internals/base.html" %}
+{% extends "base.html" %}
 {% block body %}
-	<h1>Mannschaftsbetrieb Saison 2023/24</h1>
+	<h1>Mannschaftsbetrieb</h1>
     {% for team in teams %}
-    	<h2>SG Witten {{ team.id }}</h2>
-        <ul style="list-style: none;"></ul>
-        {% for player in team.players|sort %}
-            <li{% if player.is_reserve %} class="text-body-secondary"{% endif %}>{% if player.is_reserve %}Ersatz {{ player.index_in_team + 1 - player.team.boards}}{% else %}{{ player.index_in_team + 1 }}{% endif %} {{ player.name }}</li>
-        {% endfor %}
+        <h2>{{ team.name }}</h2>
+        <ul style="list-style: none;">
+            {% for player in team.spieler %}
+                <li{% if player.ersatz %} class="text-body-secondary"{% endif %}>
+                    {% if player.ersatz %}Ersatz {% endif %}{{ player.BrettNr }} {{ player.person.name }}, {{ player.person.surname }}
+                </li>
+            {% endfor %}
+        </ul>
     {% endfor %}
-
 {% endblock %}

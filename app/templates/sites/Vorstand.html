@@ -1,4 +1,4 @@
-{% extends "Flask internals/base.html" %}
+{% extends "base.html" %}
 {% block body %}
 	<h1>Vorstand</h1>
     <table class="table">
@@ -10,11 +10,11 @@
             </tr>
         </thead>
         <tbody>
-        {% for member in members %}
-        	<tr>
-                <td>{{ member.title }}</td>
-                <td>{{ member.name }}</td>
-                <td><a href="mailto:{{ member.mail }}">{{ member.mail }}</a></td>
+        {% for role in roles %}
+            <tr>
+                <td>{{ role.titel }}</td>
+                <td>{% if role.person != None %}{{ role.person.name }}{% else %}---{% endif %}</td>
+                <td><a href="mailto:{{ role.email }}">{{ role.email }}</a></td>
             </tr>
         {% endfor %}
         </tbody>

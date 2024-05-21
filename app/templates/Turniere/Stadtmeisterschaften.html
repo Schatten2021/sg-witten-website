@@ -1,8 +1,8 @@
-{% extends "Flask internals/base.html" %}
+{% extends "base.html" %}
 {% block body %}
 	<h1>Stadtmeisterschaften</h1>
     {% for cup in cups %}
-    	<h2>{{ cup.title }}</h2>
+        <h2>{{ cup.turnier.name }}</h2>
         <h3>Teilnehmer</h3>
         <table class="table">
             <thead>
@@ -17,13 +17,13 @@
             </thead>
             <tbody>
                 {% for teilnehmer in cup.teilnehmer %}
-                	<tr>
-                        <td>{{ teilnehmer.rank }}</td>
-                        <td>{{ teilnehmer.name }}, {{ teilnehmer.surname }}</td>
-                        <td>{{ teilnehmer.team }}</td>
-                        <td>{{ teilnehmer.DWZ }}</td>
-                        <td>{{ teilnehmer.points }}</td>
-                        <td>{{ teilnehmer.Buchholz }}</td>
+                    <tr>
+                        <td>{{ teilnehmer.rang }}</td>
+                        <td>{{ teilnehmer.person.name }}</td>
+                        <td>{{ teilnehmer.verein.name }}</td>
+                        <td>{{ teilnehmer.dwz }}</td>
+                        <td>{{ teilnehmer.punkte }}</td>
+                        <td>{{ teilnehmer.buchholz }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -34,34 +34,34 @@
                 <tr>
                     <th>Rang</th>
                     <th></th>
-                    {% for teilnehmer in cup.teilnehmer %}
-                        <th scope="col">{{ teilnehmer.rank }}</th>
+                    {% for teilnehmer in cup.teilnehmer_liste %}
+                        <th scope="col">{{ teilnehmer.rang }}</th>
                     {% endfor %}
-                    <th scope="col" style="writing-mode: vertical-lr; text-orientation: mixed;">Spielfrei</th>
-                    <th scope="col" style="writing-mode: vertical-lr; text-orientation: mixed">Punkte</th>
+                    <th scope="col" rowspan="2" style="writing-mode: vertical-lr; text-orientation: mixed;">Spielfrei</th>
+                    <th scope="col" rowspan="2" style="writing-mode: vertical-lr; text-orientation: mixed">Punkte</th>
                 </tr>
                 <tr>
                     <th></th>
-                    <th class="col">Name</th>
-                    {% for teilnehmer in cup.teilnehmer %}
-                    	<th scope="col" style="writing-mode: vertical-lr; text-orientation: mixed">{{ teilnehmer.name }}, {{ teilnehmer.surname }}</th>
+                    <th>Name</th>
+                    {% for teilnehmer in cup.teilnehmer_liste %}
+                        <th scope="col" style="writing-mode: vertical-lr; text-orientation: mixed">{{ teilnehmer.person.name }}, {{ teilnehmer.person.surname }}</th>
                     {% endfor %}
-                    <th></th><th></th>
                 </tr>
             </thead>
             <tbody>
-                {% for teilnehmer in cup.teilnehmer %}
+                {% for teilnehmer in cup.teilnehmer_liste %}
                     <tr>
-                        <th scope="row">{{ teilnehmer.rank }}</th>
-                        <th scope="row">{{ teilnehmer.name }}, {{ teilnehmer.surname }}</th>
-                        {% for col, result_str in teilnehmer.results %}
-                            <td{% if col != None %} style="background-color: {{ col }}" {% endif %}>{{ result_str }}</td>
+                        <th scope="row">{{ teilnehmer.rang }}</th>
+                        <th scope="row">{{ teilnehmer.person.name }}, {{ teilnehmer.person.surname }}</th>
+                        {% for color, string in teilnehmer.results %}
+                            <td{% if col != None %} style="background-color: {{ color }}"{% endif %}>
+                                {{ string }}
+                            </td>
                         {% endfor %}
-                        <td>{{ teilnehmer.points }}</td>
                     </tr>
                 {% endfor %}
+
             </tbody>
         </table>
     {% endfor %}
-
 {% endblock %}

@@ -1,4 +1,4 @@
-{% extends "Flask internals/base.html" %}
+{% extends "base.html" %}
 {% block body %}
 	<h1>Erstelle einen Account</h1>
     <form method="post">
@@ -18,7 +18,7 @@
             Vorname:
         </label>
         <input type="text" class="form-control" name="surname" id="Vorname" required>
-        <input type="submit" class="btn btn-primary" value="Login">
+        <input type="submit" class="btn btn-primary" value="Erstellen">
     </form>
 
     <a href="/signup">

@@ -12,7 +12,7 @@ Pages that are still left to be done
   - Jüngster Teilnehmer
 - Sparkassen Open
   - Kurzer Artikel
-  - Rangliste & Rundenergebnisse als PDF
+  - Rangliste & Rundendergebnissen als PDF
   - 3 Ratinggruppen
     - Je 3 Plätze
       - Name

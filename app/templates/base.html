@@ -29,9 +29,9 @@
                         </button>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item{% if request.endpoint == "turniere" %} active{% endif %}" href="/Turniere">Alle</a></li>
-                            <li><a class="dropdown-item{% if request.endpoint == "sparkassen_jugend_open" %} active{% endif %}" href="/SparkassenJugendOpen">Sparkassen Jugend Open</a></li>
-                            <li><a class="dropdown-item{% if request.endpoint == "vereinsturniere" %} active{% endif %}" href="/Vereinsturniere">Vereinsturniere</a></li>
-                            <li><a class="dropdown-item{% if request.endpoint == "stadtmeisterschaften" %} active{% endif %}" href="/Stadtmeisterschaften">Stadtmeisterschaften</a></li>
+                            <li><a class="dropdown-item{% if request.endpoint == "sparkassen_jugend_open" %} active{% endif %}" href="/Turniere/SparkassenJugendOpen">Sparkassen Jugend Open</a></li>
+                            <li><a class="dropdown-item{% if request.endpoint == "vereinsturniere" %} active{% endif %}" href="/Turniere/Vereinsturniere">Vereinsturniere</a></li>
+                            <li><a class="dropdown-item{% if request.endpoint == "stadtmeisterschaften" %} active{% endif %}" href="/Turniere/Stadtmeisterschaften">Stadtmeisterschaften</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
@@ -56,6 +56,11 @@
                         <div class="alert alert-info alert-dismissible" role="alert">
                             {{ message|safe }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% elif category == "error" %}
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                        {{ message|safe }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% else %}
                         <div class="alert alert-{{ category }} alert-dismissible" role="alert">
