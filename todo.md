@@ -18,7 +18,6 @@ Pages that are still left to be done
       - Name
       - Verein
       - Punkte
-- Email verification upon login/sign up
 
 Pages/Things that could still be done
 ---
@@ -40,3 +39,4 @@ Things that have been done:
 - (Impressum)
 - Generelles Layout
 - Stadtmeisterschaften
+- Email verification upon login/sign up

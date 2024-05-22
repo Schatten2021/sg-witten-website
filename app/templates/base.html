@@ -41,8 +41,8 @@
                         <a class="nav-link{% if request.endpoint == 'vorstand' %} active{% endif %}" href="/Vorstand">Vorstand</a>
                     </li>
                 </ul>
-                <a href="/login">
-                    <i class="fa-solid fa-user btn fs-1{% if request.endpoint in ["login", "signup"] %} active{% endif %}" role="button" style="color: #ffffff;"></i>
+                <a href="/login" class="nav-item nav-link">
+                    <i class="fa-solid fa-user btn fs-1{% if request.endpoint in ["login", "signup"] %} active{% endif %}" role="button"></i>
                 </a>
             </div>
         </nav>
