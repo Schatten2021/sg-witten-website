@@ -50,9 +50,15 @@
                     </li>
                 {% endif %}
                 </ul>
-                <a href="/login" class="nav-item nav-link">
-                    <i class="fa-solid fa-user btn fs-1{% if request.endpoint in ["login", "signup"] %} active{% endif %}" role="button"></i>
-                </a>
+                {% if current_user.is_anonymous %}
+                    <a href="/login" class="nav-item nav-link">
+                        <i class="fa-solid fa-user btn fs-1{% if request.endpoint in ["login", "signup"] %} active{% endif %}" role="button"></i>
+                    </a>
+                {% else %}
+                    <a href="/logout" class="nav-item nav-link" onclick="confirm('logout?')">
+                        <i class="fa-solid fa-right-from-bracket btn fs-1"></i>
+                    </a>
+                {% endif %}
             </div>
         </nav>
     </div>

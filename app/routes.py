@@ -3,7 +3,7 @@ import string
 from urllib.parse import quote
 
 from flask import render_template, flash, request, make_response
-from flask_login import current_user, login_user
+from flask_login import current_user, login_user, logout_user
 from flask_mail import Message
 
 from app import app, db, mail
@@ -154,6 +154,13 @@ def verify_email():
     db.session.add(current_user)
     db.session.commit()
     flash("E-Mail erfolgreich verifiziert.")
+    return redirect("/")
+
+
+@app.route("/logout")
+def logout():
+    if logout_user():
+        flash("logged out successfully")
     return redirect("/")
 
 
