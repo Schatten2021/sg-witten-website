@@ -31,7 +31,7 @@ def index():
 
 @bp.route("/personen")
 def personen():
-    people = sorted(Person.query.all(), key=lambda p: p.name + " " + p.surname)
+    people: list[Person] = sorted(Person.query.all(), key=lambda p: p.name.lower() + " " + p.surname.lower())
     return render_template("admin/personen.html", people=people)
 
 
@@ -41,9 +41,15 @@ def personen():
 @bp.route("/turniere")
 @bp.route("/turniere/<int:id>")
 @bp.route("/turniere/sparkassen_jugend_open")
+@bp.route("/turniere/sparkassen_jugend_open/<int:id>")
 @bp.route("/turniere/vereinsturniere")
+@bp.route("/turniere/vereinsturniere/<int:id>")
 @bp.route("/turniere/stadtmeisterschaften")
-@bp.route("/mannschaftsbetrieb")
+@bp.route("/turniere/stadtmeisterschaften/<int:id>")
+@bp.route("/mannschaften")  # für Mannschaftsbetrieb
+@bp.route("/mannschaften/<int:id>")
+@bp.route("/teams")  # für Teams bei Turnieren
+@bp.route("/teams/<int:id>")
 def undefined(*args, **kwargs):
     for arg in args:
         flash(f"got arg {arg}")

@@ -13,6 +13,22 @@ class Person(db.Model):
     name: str = Column(String)
     surname: str = Column(String)
 
+    @property
+    def account(self) -> Optional["Account"]:
+        return Account.query.filter_by(person_id=self.id).first()
+
+    @property
+    def mannschaftsspieler(self) -> list["Mannschaftsspieler"]:
+        return Mannschaftsspieler.query.filter_by(person_id=self.id).all()
+
+    @property
+    def sparkassen_jugend_open_teilnahmen(self) -> list["SparkassenJugendOpenTeilnehmer"]:
+        return SparkassenJugendOpenTeilnehmer.query.filter_by(person_id=self.id).all()
+
+    @property
+    def stadtmeisterschaft_teilnahmen(self) -> list["StadtmeisterschaftTeilnehmer"]:
+        return StadtmeisterschaftTeilnehmer.query.filter_by(person_id=self.id).all()
+
 
 #
 # Account management
@@ -157,7 +173,7 @@ class StadtmeisterschaftTeilnehmer(db.Model):
     person_id: Mapped[int] = Column(ForeignKey("person.id"))
     person: Mapped[Person] = relationship("Person")
     turnier_id: Mapped[int] = Column(ForeignKey("stadtmeisterschaft.id"))
-    turnier: Mapped[Turnier] = relationship("Stadtmeisterschaft", back_populates="teilnehmer")
+    turnier: Mapped[Stadtmeisterschaft] = relationship("Stadtmeisterschaft", back_populates="teilnehmer")
     dwz: Mapped[int] = Column(Integer)
     rang: Mapped[int] = Column(Integer)
     buchholz: Mapped[float] = Column(Float)

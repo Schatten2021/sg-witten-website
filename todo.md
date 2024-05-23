@@ -40,3 +40,4 @@ Things that have been done:
 - Generelles Layout
 - Stadtmeisterschaften
 - Email verification upon login/sign up
+- admin personen
