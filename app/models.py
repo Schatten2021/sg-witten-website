@@ -31,6 +31,11 @@ class Account(db.Model):
     is_authenticated: Mapped[bool] = Column(Boolean, default=False)
     roles: Mapped[list[Role]] = relationship("Role", "role_account_association_table", back_populates="accounts")
 
+    @property
+    def is_admin(self) -> bool:
+        admin_role: Role = Role.query.first()
+        return admin_role is not None and admin_role in self.roles
+
     def set_password(self, password: str):
         self.password = generate_password_hash(password)
 

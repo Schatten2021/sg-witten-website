@@ -40,6 +40,15 @@
                     <li class="nav-item">
                         <a class="nav-link{% if request.endpoint == 'vorstand' %} active{% endif %}" href="/Vorstand">Vorstand</a>
                     </li>
+                {% if current_user.is_admin %}
+                	<li class="nav-item dropdown">
+                        <button class="nav-link dropdown-toggle{% if request.endpoint and request.endpoint.startswith("admin.") %} active{% endif %}" data-bs-toggle="dropdown" aria-expanded="false">Admin</button>
+                        <ul class="dropdown-menu">
+                            <li><a href="/admin/" class="dropdown-item{% if request.endpoint == "admin.index" %} active{% endif %}">Main</a></li>
+                            <li><a href="/admin/personen" class="dropdown-item{% if request.endpoint == "admin.personen" %} active{% endif %}">Personen</a> </li>
+                        </ul>
+                    </li>
+                {% endif %}
                 </ul>
                 <a href="/login" class="nav-item nav-link">
                     <i class="fa-solid fa-user btn fs-1{% if request.endpoint in ["login", "signup"] %} active{% endif %}" role="button"></i>

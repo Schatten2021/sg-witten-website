@@ -9,6 +9,7 @@ from flask_mail import Message
 from app import app, db, mail
 from app.models import Account, Person, AuthenticationRequest, Mannschaft, VorstandsRolle, Turnier, \
     SparkassenJugendOpen, Stadtmeisterschaft
+from app.admin_routes import *
 
 
 # general flask stuff
@@ -25,7 +26,7 @@ def not_found(*_):
 
 @app.before_request
 def before_request():
-    if request.endpoint != "static":
+    if request.endpoint != "static" and "Location" not in request.headers:
         flash(
             f"This is a personal remake of the official SG-Witten Website (<a href=\"https://schachgesellschaft-witten.de/\">original</a>). "
             f"Alle Daten auf dieser Seite sind dem Original entnommen. "
@@ -51,10 +52,10 @@ def login():
         return redirect(request.args.get("next", "/"))
     # verify request
     if request.method == 'GET':
-        return render_template("Account and Admin/login.html")
+        return render_template("Account/login.html")
     if "email" not in request.form or "password" not in request.form:
         flash("Email und Passwort werden Benötigt!", "error")
-        return render_template("Account and Admin/login.html")
+        return render_template("Account/login.html")
 
     # get account
     email = request.form["email"]
@@ -64,11 +65,11 @@ def login():
     # verify login
     if len(account) != 1:
         flash("Ungültige E-Mail-Adresse oder Password", "error")
-        return render_template("Account and Admin/login.html")
+        return render_template("Account/login.html")
     account: Account = account[0]
     if not account.check_password(password):
         flash("Ungültige E-Mail-Adresse oder Password", "error")
-        return render_template("Account and Admin/login.html")
+        return render_template("Account/login.html")
 
     # login
     login_user(account)
@@ -82,27 +83,30 @@ def signup():
     if not current_user.is_anonymous:
         return redirect(request.args.get("next", "/"))
     if request.method == 'GET':
-        return render_template("Account and Admin/signup.html")
+        return render_template("Account/signup.html")
     if any(elem not in request.form for elem in ["email", "password", "name", "surname"]):
         flash("E-Mail, Passwort, Vor- und Nachname werden benötigt!")
-        return render_template("Account and Admin/signup.html")
+        return render_template("Account/signup.html")
 
     # check if user doesn't already exist
     account: list[Account] = Account.query.filter_by(email=request.form["email"]).all()
     if len(account) != 0:
         flash("E-Mail bereits vergeben mit Passwort: \"123\"")
-        return render_template("Account and Admin/signup.html")
+        return render_template("Account/signup.html")
     password = request.form["password"]
     min_passwd_len = app.config.get("min_password_length", 8)
     if len(password) < min_passwd_len:
         flash(f"Passwort muss mindestens {min_passwd_len} Zeichen lang sein!")
-        return render_template("Account and Admin/signup.html")
+        return render_template("Account/signup.html")
 
     # find/create person
     person: Person = Person.query.filter_by(name=request.form["name"],
                                             surname=request.form["surname"]).first()
     if person is None:
         person = Person(name=request.form["name"], surname=request.form["surname"])
+    elif Account.query.filter_by(person=person).first() is not None:
+        flash(f"Sie haben bereits einen Account.")
+        return redirect("/login")
 
     # create account
     account: Account = Account(email=request.form["email"],
@@ -116,7 +120,7 @@ def signup():
     authentication_request: AuthenticationRequest = AuthenticationRequest(id=authentication_id,
                                                                           account=account)
     db.session.add(authentication_request)
-    email_content: str = render_template("Account and Admin/verification email.html",
+    email_content: str = render_template("Account/verification email.html",
                                          authentication_request=authentication_request)
 
     email = Message(subject="Bitte bestätigen sie Ihre E-Mail Adresse", recipients=[request.form["email"]],

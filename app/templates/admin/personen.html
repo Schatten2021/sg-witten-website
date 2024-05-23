@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block body %}
+	<h1>Personen</h1>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 1rem">
+    {% for person in people %}
+    	<div class="card">
+            <div class="card-header"><a class="text-reset" href="/admin/users/{{ person.id }}">{{ person.name }}, {{ person.surname }}</a></div>
+            <ul class="list-group list-group-flush">
+
+            </ul>
+        </div>
+    {% endfor %}
+    </div>
+
+{% endblock %}
