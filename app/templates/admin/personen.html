@@ -4,9 +4,8 @@
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr)); gap: 1rem">
     {% for person in people %}
     	<div class="card">
-            <div class="card-header"><a class="text-reset" href="/admin/users/{{ person.id }}">{{ person.name }}, {{ person.surname }}</a></div>
+            <div class="card-header"><a class="text-reset" href="/admin/personen/{{ person.id }}">{{ person.name }}, {{ person.surname }}</a></div>
             <ul class="list-group list-group-flush">
-            {# TODO: Account got moved to /personen/<int: id> #}
                 {% if person.mannschaftsspieler %}
                     {% for team in person.mannschaftsspieler %}
                 	    <li class="list-group-item">Spielt in <a class="card-link" href="/admin/mannschaften/{{ team.mannschaft.id }}">{{ team.mannschaft.name }}</a> </li>

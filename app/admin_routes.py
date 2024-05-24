@@ -36,8 +36,13 @@ def personen():
 
 
 @bp.route("/personen/<int:person_id>")
-@bp.route("/users")
-@bp.route("/users/<int:id>")
+def personen_details(person_id):
+    person: Person = Person.query.get(person_id)
+    if person is None:
+        return render_template("Flask internals/404.html"), 404
+    return render_template("admin/personen_details.html", person=person)
+
+
 @bp.route("/turniere")
 @bp.route("/turniere/<int:id>")
 @bp.route("/turniere/sparkassen_jugend_open")

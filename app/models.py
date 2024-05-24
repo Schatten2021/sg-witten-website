@@ -194,22 +194,7 @@ class StadtmeisterschaftTeilnehmer(db.Model):
         res: list[tuple[Optional[str], str]] = []
         player_results: dict[StadtmeisterschaftTeilnehmer, tuple[str, str]] = {}
         for game in played_games:
-            game_res: int = game.get_result(self)
-            other_player: StadtmeisterschaftTeilnehmer = game.get_other(self)
-            match game_res:
-                case 0:
-                    player_results[other_player] = ("#990", "½")
-                case 1:
-                    player_results[other_player] = ("#090", "1")
-                case 2:
-                    player_results[other_player] = ("#0F0", "+")
-                case -1:
-                    player_results[other_player] = ("#900", "0")
-                case -2:
-                    player_results[other_player] = ("#F00", "-")
-                case _:
-                    logging.error(f"Unexpected result {game_res}")
-                    player_results[other_player] = ("#000", "?")
+            player_results[game.get_other(self)] = game.get_result_str(self)
         for player in players:
             if player == self:
                 res.append(("#00A", "X"))
@@ -240,3 +225,31 @@ class StadtmeisterschaftSpiel(db.Model):
         if self.spieler1_id == player.id:
             return StadtmeisterschaftTeilnehmer.query.get(self.spieler2_id)
         return StadtmeisterschaftTeilnehmer.query.get(self.spieler1_id)
+
+    def get_result_str(self, player: StadtmeisterschaftTeilnehmer) -> tuple[str, str]:
+        game_res: int = self.get_result(player)
+        if game_res is None:
+            return "", ""
+        match game_res:
+            case 0:
+                return "#990", "½"
+            case 1:
+                return "#090", "1"
+            case 2:
+                return "#0F0", "+"
+            case -1:
+                return "#900", "0"
+            case -2:
+                return "#F00", "-"
+            case _:
+                logging.error(f"Unexpected result {game_res}")
+                return "#000", "?"
+
+
+    @property
+    def spieler1(self):
+        return StadtmeisterschaftTeilnehmer.query.get(self.spieler1_id)
+
+    @property
+    def spieler2(self):
+        return StadtmeisterschaftTeilnehmer.query.get(self.spieler2_id)
