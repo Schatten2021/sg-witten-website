@@ -6,6 +6,12 @@
     	<div class="card">
             <div class="card-header"><a class="text-reset" href="/admin/personen/{{ person.id }}">{{ person.name }}, {{ person.surname }}</a></div>
             <ul class="list-group list-group-flush">
+                {% if person.vorstands_rollen %}
+                    {% for rolle in person.vorstands_rollen %}
+                    	<li class="list-group-item"><b>{{ rolle.titel }}</b></li>
+                    {% endfor %}
+
+                {% endif %}
                 {% if person.mannschaftsspieler %}
                     {% for team in person.mannschaftsspieler %}
                 	    <li class="list-group-item">Spielt in <a class="card-link" href="/admin/mannschaften/{{ team.mannschaft.id }}">{{ team.mannschaft.name }}</a> </li>
@@ -20,7 +26,6 @@
                 	{% for teilnahme in person.sparkassen_jugend_open_teilnahmen %}
                 		<li class="list-group-item">Teilgenommen am <a class="card-link" href="/admin/sparkassen_jugend_open/{{ teilnahme.turnier.id }}">{{ teilnahme.turnier.turnier.name }}</a> </li>
                 	{% endfor %}
-
                 {% endif %}
             </ul>
         </div>

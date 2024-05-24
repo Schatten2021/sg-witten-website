@@ -29,6 +29,10 @@ class Person(db.Model):
     def stadtmeisterschaft_teilnahmen(self) -> list["StadtmeisterschaftTeilnehmer"]:
         return StadtmeisterschaftTeilnehmer.query.filter_by(person_id=self.id).all()
 
+    @property
+    def vorstands_rollen(self) -> list["VorstandsRolle"]:
+        return VorstandsRolle.query.filter_by(person_id=self.id).all()
+
 
 #
 # Account management

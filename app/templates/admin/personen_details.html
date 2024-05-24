@@ -9,6 +9,32 @@
             <p>Verifiziert: {% if person.account.is_authenticated %}<i class="fa-solid fa-check"></i>{% else %}<i class="fa-solid fa-xmark"></i>{% endif %}</p>
         </div>
     {% endif %}
+    {% if person.vorstands_rollen %}
+        <div id="vorstandsrollen">
+            {% if person.vorstands_rollen|length > 1 %}
+            	<h2>Vorstandsrollen:</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Titel</th>
+                            <th scope="col">E-Mail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rolle in person.vorstands_rollen %}
+                        	<tr>
+                                <td>{{ rolle.titel }}</td>
+                                <td><a href="mailto:{{ rolle.email }}">{{ rolle.email }}</a></td>
+                            </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            {% else %}
+                <h2>Vorstandsrolle: {{ person.vorstands_rollen[0].titel }} (<a href="mailto:{{ person.vorstands_rollen[0].email }}">{{ person.vorstands_rollen[0].email }}</a></h2>
+            {% endif %}
+        </div>
+    {% endif %}
     {% if person.mannschaftsspieler %}
         <div id="mannschaftsspieler">
             <h2>Mannschaftsspieler</h2>
