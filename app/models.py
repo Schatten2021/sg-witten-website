@@ -98,6 +98,11 @@ class Mannschaftsspieler(db.Model):
     BrettNr: Mapped[int] = Column(Integer)
     ersatz: Mapped[bool] = Column(Boolean)
 
+    def __lt__(self, other: "Mannschaftsspieler") -> bool:
+        if self.ersatz != other.ersatz:
+            return not self.ersatz and other.ersatz
+        return self.BrettNr < other.BrettNr
+
 
 #
 # Vorstand

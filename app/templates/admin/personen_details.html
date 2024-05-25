@@ -4,7 +4,7 @@
     {% if person.account %}
         <div id="account">
             <h2>Account</h2>
-            <p>Id: {{ person.account.id }}</p>
+            <p>Id: {{ person.id }}</p>
             <p>E-Mail: <a href="mailto:{{ person.account.email }}">{{ person.account.email }}</a></p>
             <p>Verifiziert: {% if person.account.is_authenticated %}<i class="fa-solid fa-check"></i>{% else %}<i class="fa-solid fa-xmark"></i>{% endif %}</p>
         </div>
@@ -40,7 +40,7 @@
             <h2>Mannschaftsspieler</h2>
             {% for spieler in person.mannschaftsspieler %}
                 <div class="mannschaftsspieler">
-                    <h3><a href="/admin/mannschaften/{{ spieler.mannschaft.id }}">{{ spieler.mannschaft.name }}</a></h3>
+                    <h3><a href="/admin/mannschaften">{{ spieler.mannschaft.name }}</a></h3>
                     <p>
                         {% if spieler.ersatz %}
                             Ersatz

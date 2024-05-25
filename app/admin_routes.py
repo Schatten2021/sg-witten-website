@@ -1,8 +1,9 @@
-from flask import Blueprint, render_template, flash
+from flask import Blueprint, render_template, flash, request
 from flask_login import current_user
 from jinja2 import TemplateNotFound
 
-from app.models import Account, Role, Person
+from app.models import Account, Role, Person, Mannschaft, Mannschaftsspieler
+from app.routes import redirect
 from app import app, db
 
 bp = Blueprint('admin', __name__, url_prefix='/admin', template_folder="templates")
@@ -43,6 +44,55 @@ def personen_details(person_id):
     return render_template("admin/personen_details.html", person=person)
 
 
+@bp.route("/mannschaften")  # für Mannschaftsbetrieb
+def mannschaften():
+    teams: list[Mannschaft] = Mannschaft.query.all()
+    return render_template("admin/mannschaften.html", teams=teams)
+
+
+@bp.route("/mannschaften/player_up/<int:player_id>")
+def player_up(player_id):
+    player: Mannschaftsspieler = Mannschaftsspieler.query.get(player_id)
+    if player is None:
+        flash(f"Player {player_id} not found")
+        return redirect(request.referrer)
+    team: Mannschaft = player.mannschaft
+    players: list[Mannschaftsspieler] = sorted(team.spieler)
+    team_index: int = players.index(player)
+    if team_index == 0:
+        flash(f"Player {player.person.surname} {player.person.name} already at the top")
+        return redirect(request.referrer)
+    previous = players[team_index - 1]
+    player.ersatz, previous.ersatz = previous.ersatz, player.ersatz
+    player.BrettNr, previous.BrettNr = previous.BrettNr, player.BrettNr
+    db.session.add_all([player, team])
+    db.session.commit()
+    flash(f"updated successfully")
+    return redirect(request.referrer)
+
+
+# noinspection DuplicatedCode
+@bp.route("/mannschaften/player_down/<int:player_id>")
+def player_down(player_id):
+    player: Mannschaftsspieler = Mannschaftsspieler.query.get(player_id)
+    if player is None:
+        flash(f"Player {player_id} not found")
+        return redirect(request.referrer)
+    team: Mannschaft = player.mannschaft
+    players: list[Mannschaftsspieler] = sorted(team.spieler)
+    team_index: int = players.index(player)
+    if team_index == (len(players)-1):
+        flash(f"Player {player.person.surname} {player.person.name} already at the bottom")
+        return redirect(request.referrer)
+    next_player = players[team_index + 1]
+    player.ersatz, next_player.ersatz = next_player.ersatz, player.ersatz
+    player.BrettNr, next_player.BrettNr = next_player.BrettNr, player.BrettNr
+    db.session.add_all([player, team])
+    db.session.commit()
+    flash(f"updated successfully")
+    return redirect(request.referrer)
+
+
 @bp.route("/turniere")
 @bp.route("/turniere/<int:id>")
 @bp.route("/turniere/sparkassen_jugend_open")
@@ -51,8 +101,6 @@ def personen_details(person_id):
 @bp.route("/turniere/vereinsturniere/<int:id>")
 @bp.route("/turniere/stadtmeisterschaften")
 @bp.route("/turniere/stadtmeisterschaften/<int:id>")
-@bp.route("/mannschaften")  # für Mannschaftsbetrieb
-@bp.route("/mannschaften/<int:id>")
 @bp.route("/teams")  # für Teams bei Turnieren
 @bp.route("/teams/<int:id>")
 def undefined(*args, **kwargs):

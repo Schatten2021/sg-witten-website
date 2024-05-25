@@ -4,7 +4,7 @@
     {% for team in teams %}
         <h2>{{ team.name }}</h2>
         <ul style="list-style: none;">
-            {% for player in team.spieler %}
+            {% for player in team.spieler|sort %}
                 <li{% if player.ersatz %} class="text-body-secondary"{% endif %}>
                     {% if player.ersatz %}Ersatz {% endif %}{{ player.BrettNr }} {{ player.person.name }}, {{ player.person.surname }}
                 </li>

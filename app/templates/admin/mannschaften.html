@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block body %}
+    <h1>Mannschaften</h1>
+    <div id="teams" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr)); gap: 1rem">
+        {% for team in teams %}
+        	<div class="card">
+                <div class="card-header"><h5 class="card-title">{{ team.name }}</h5></div>
+                <table class="table" style="margin: 0">
+                    {% for member in team.spieler|sort %}
+                        <tr>
+                            <td>
+                                {% if member.ersatz %}
+                                    Ersatz
+                                {% else %}
+                                    Brett
+                                {% endif %}
+                                {{ member.BrettNr }}
+                            </td>
+                            <td>
+                                <a href="/admin/personen/{{ member.person.id }}" class="col">
+                                    {{ member.person.name }}, {{ member.person.surname }}
+                                </a>
+                            </td>
+                            <td>
+                                <a href="/admin/mannschaften/player_up/{{ member.id }}">
+                                    <i class="fa-solid fa-arrow-up btn" role="button"></i></a> <!-- do NOT add newline -->
+                                <a href="/admin/mannschaften/player_down/{{ member.id }}">
+                                    <i class="fa-solid fa-arrow-down btn" role="button"></i></a> <!-- do not add newline -->
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -9,7 +9,6 @@ from flask_mail import Message
 from app import app, db, mail
 from app.models import Account, Person, AuthenticationRequest, Mannschaft, VorstandsRolle, Turnier, \
     SparkassenJugendOpen, Stadtmeisterschaft
-from app.admin_routes import *
 
 
 # general flask stuff
@@ -194,3 +193,6 @@ def mannschaftsbetrieb():
 def vorstand():
     roles: list[VorstandsRolle] = VorstandsRolle.query.all()
     return render_template("sites/Vorstand.html", roles=roles)
+
+
+from app.admin_routes import *
