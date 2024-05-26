@@ -44,6 +44,22 @@ def personen_details(person_id):
     return render_template("admin/personen_details.html", person=person)
 
 
+@bp.route("/personen/<int:person_id>/change_name")
+def personen_change_name(person_id):
+    person: Person = Person.query.get(person_id)
+    if person is None:
+        return render_template("Flask internals/404.html"), 404
+    if "name" not in request.args or "surname" not in request.args:
+        flash("Name and surname must be provided", "error")
+        return redirect(f"/admin/personen/{person_id}")
+    person.name = request.args["name"]
+    person.surname = request.args["surname"]
+    db.session.commit()
+    flash(f"Name updated successfully", "success")
+    return redirect(f"/admin/personen/{person_id}")
+
+
+# Mannschaften
 @bp.route("/mannschaften")  # für Mannschaftsbetrieb
 def mannschaften():
     teams: list[Mannschaft] = Mannschaft.query.all()

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block body %}
-	<h1>{{ person.name }}, {{ person.surname }}</h1>
+	<h1 id="name">{{ person.name }}, {{ person.surname }} <i class="fa-solid fa-pen btn" onclick="changeName()"></i></h1>
     {% if person.account %}
         <div id="account">
             <h2>Account</h2>
@@ -96,6 +96,23 @@
             <p>Jahrgang: U {{ teilnahme.Jahrgang }}</p>
             <p>Verein: <a href="/admin/teams/{{ teilnahme.verein.id }}">{{ teilnahme.verein.name }}</a></p>
         {% endfor %}
-
     {% endif %}
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        function changeName(){
+            const elem = document.getElementById("name");
+            elem.innerHTML = "<form><input type='text' value='{{ person.name }}'>, <input type='text' value='{{ person.surname }}'><input type='submit' hidden='hidden'> <form>"
+            const form = elem.children[0];
+            const nameInput = form.children[0];
+            const surnameInput = form.children[1];
+            form.addEventListener("submit", (e) => {
+                e.preventDefault()
+                window.location = `/admin/personen/{{ person.id }}/change_name?surname=${surnameInput.value}&name=${nameInput.value}`
+            })
+            console.log("changing name")
+            console.debug(form)
+        }
+    </script>
 {% endblock %}
