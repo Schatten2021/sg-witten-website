@@ -1,8 +1,10 @@
+from datetime import datetime
+
 from flask import Blueprint, render_template, flash, request
 from flask_login import current_user
 from jinja2 import TemplateNotFound
 
-from app.models import Account, Role, Person, Mannschaft, Mannschaftsspieler
+from app.models import Account, Role, Person, Mannschaft, Mannschaftsspieler, Turnier
 from app.routes import redirect
 from app import app, db
 
@@ -83,7 +85,7 @@ def player_up(player_id):
     player.BrettNr, previous.BrettNr = previous.BrettNr, player.BrettNr
     db.session.add_all([player, team])
     db.session.commit()
-    flash(f"updated successfully")
+    flash(f"updated successfully", "success")
     return redirect(request.referrer)
 
 
@@ -105,11 +107,37 @@ def player_down(player_id):
     player.BrettNr, next_player.BrettNr = next_player.BrettNr, player.BrettNr
     db.session.add_all([player, team])
     db.session.commit()
-    flash(f"updated successfully")
+    flash(f"updated successfully", "success")
     return redirect(request.referrer)
 
 
 @bp.route("/turniere")
+def turniere():
+    cups: list[Turnier] = Turnier.query.all()
+    return render_template("admin/turniere.html", cups=cups)
+
+
+@bp.route("/turniere/edit")
+def edit_turnier():
+    if any(elem not in request.args for elem in ["id", "name", "date"]):
+        flash("id, name and date (in ISO format) must be provided.", "error")
+        return redirect("/turniere")
+    turnier: Turnier = Turnier.query.get(request.args["id"])
+    if turnier is None:
+        return render_template("Flask internals/404.html"), 404
+    dt: datetime = None
+    try:
+        dt: datetime = datetime.fromisoformat(request.args["date"])
+    except ValueError:
+        flash(f"Invalid ISO format {request.args['date']}")
+    turnier.name = request.args["name"]
+    turnier.date = dt.date()
+    db.session.add(turnier)
+    db.session.commit()
+    flash(f"updated turnier {turnier.name} successfully", "success")
+    return redirect("/admin/turniere")
+
+
 @bp.route("/turniere/<int:id>")
 @bp.route("/turniere/sparkassen_jugend_open")
 @bp.route("/turniere/sparkassen_jugend_open/<int:id>")
