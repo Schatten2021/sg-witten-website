@@ -30,6 +30,16 @@
             </ul>
         </div>
     {% endfor %}
+        <form class="card" style="display: flex; justify-content: center; align-items: center" action="/admin/personen/add">
+            <label>
+                Name: <input type="text" name="name" required>
+            </label>
+            <label>
+                Vorname: <input type="text" name="surname" required>
+            </label>
+            <button class="btn" type="submit">
+                <i class="fa-solid fa-user-plus fs-1"></i>
+            </button>
+        </form>
     </div>
-
 {% endblock %}

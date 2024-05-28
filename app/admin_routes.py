@@ -61,6 +61,22 @@ def personen_change_name(person_id):
     return redirect(f"/admin/personen/{person_id}")
 
 
+@bp.route("/personen/add")
+def add_person():
+    if "name" not in request.args or "surname" not in request.args:
+        flash("Name and surname must be provided", "error")
+        return redirect(f"/admin/personen")
+    person: Person = Person.query.filter_by(name=request.args["name"], surname=request.args["surname"]).first()
+    if person is not None:
+        flash(f"Person {person.name}, {person.surname} already exists.", "error")
+        return redirect(f"/admin/personen")
+    person = Person(name=request.args["name"], surname=request.args["surname"])
+    db.session.add(person)
+    db.session.commit()
+    flash(f"Person {person.name}, {person.surname} added.", "success")
+    return redirect(f"/admin/personen/{person.id}")
+
+
 # Mannschaften
 @bp.route("/mannschaften")  # für Mannschaftsbetrieb
 def mannschaften():
