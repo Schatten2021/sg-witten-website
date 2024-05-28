@@ -27,9 +27,9 @@ def not_found(*_):
 def before_request():
     if request.endpoint != "static" and "Location" not in request.headers:
         flash(
-            f"This is a personal remake of the official SG-Witten Website (<a href=\"https://schachgesellschaft-witten.de/\">original</a>). "
+            f"Dies ist ein persönliches Remake der SG-Witten Website (<a href=\"https://schachgesellschaft-witten.de/\">Original</a>). "
             f"Alle Daten auf dieser Seite sind dem Original entnommen. "
-            f"Source code available on <a href=\"https://github.com/Schatten2021/sg-witten-website\">github</a>",
+            f"Quellcode auf <a href=\"https://github.com/Schatten2021/sg-witten-website\">GitHub</a>",
             "warning")
 
 
