@@ -111,7 +111,7 @@ def player_down(player_id):
     player: Mannschaftsspieler = Mannschaftsspieler.query.get(player_id)
     if player is None:
         flash(f"Player {player_id} not found")
-        return redirect(request.referrer)
+        return redirect("/admin/mannschaften")
     team: Mannschaft = player.mannschaft
     players: list[Mannschaftsspieler] = sorted(team.spieler)
     team_index: int = players.index(player)
@@ -135,17 +135,18 @@ def turniere():
 
 @bp.route("/turniere/edit")
 def edit_turnier():
-    if any(elem not in request.args for elem in ["id", "name", "date"]):
-        flash("id, name and date (in ISO format) must be provided.", "error")
-        return redirect("/turniere")
+    not_present = {elem for elem in ["id", "name", "date"] if elem not in request.args}
+    if len(not_present) != 0:
+        flash(f"[{', '.join(not_present)}] must be provided.", "error")
+        return redirect("admin/turniere")
     turnier: Turnier = Turnier.query.get(request.args["id"])
     if turnier is None:
         return render_template("Flask internals/404.html"), 404
-    dt: datetime = None
     try:
-        dt: datetime = datetime.fromisoformat(request.args["date"])
+        dt: datetime = datetime.strptime(request.args["date"], "%Y-%m-%d")
     except ValueError:
         flash(f"Invalid ISO format {request.args['date']}")
+        return redirect("/admin/turniere")
     turnier.name = request.args["name"]
     turnier.date = dt.date()
     db.session.add(turnier)

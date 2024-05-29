@@ -4,11 +4,12 @@
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr)); gap: 1rem">
         {% for cup in cups %}
         	<form class="card"
-                 data-id="{{ cup.id }}"
-                 data-name="{{ cup.name }}"
-                 data-date-year="{{ cup.date.year }}"
-                 data-date-month="{{ cup.date.month + 1 }}"
-                 data-date-day="{{ cup.date.day + 1 }}">
+                  data-id="{{ cup.id }}"
+                  data-name="{{ cup.name }}"
+                  data-date-year="{{ cup.date.year }}"
+                  data-date-month="{{ cup.date.month + 1 }}"
+                  data-date-day="{{ cup.date.day + 1 }}"
+                  action="/admin/turniere/edit">
                 <div class="card-header card-title">{{ cup.name }} <i class="fa-solid fa-pen btn" onclick="changeName()"></i></div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
@@ -33,16 +34,16 @@
             }
             console.debug(data)
             const header = form.children[0];
-            header.innerHTML = `<input type="text" value="${data.name}" style="width: 100%">`;
-            const nameInput = header.children[0];
+            header.innerHTML = `<input type="text" value="${data.name}" style="width: 100%" name="name">`;
+            {#const nameInput = header.children[0];#}
             const cardBody = form.children[1].children[0].children[0];
-            cardBody.innerHTML = `<input type="date" value="${data.date.toISOString().slice(0, 10)}">`;
-            const dateInput = cardBody.children[0];
-            form.addEventListener("submit", (e) => {
-                e.preventDefault();
-                const url = `/admin/turniere/edit?id=${data.id}&name=${nameInput.value}&date=${dateInput.value}`
-                window.location = encodeURI(url)
-            })
+            cardBody.innerHTML = `<input type="date" value="${data.date.toISOString().slice(0, 10)}" name="date"><input type="number" value="${data.id}" name="id" hidden/>`;
+            {#const dateInput = cardBody.children[0];#}
+            {#form.addEventListener("submit", (e) => {#}
+            {#    e.preventDefault();#}
+            {#    const url = `/admin/turniere/edit?id=${data.id}&name=${nameInput.value}&date=${dateInput.value}`#}
+            {#    window.location = encodeURI(url)#}
+            {# }) #}
         }
     </script>
 {% endblock %}
