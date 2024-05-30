@@ -8,7 +8,7 @@ from flask_mail import Message
 
 from app import app, db, mail
 from app.models import Account, Person, AuthenticationRequest, Mannschaft, VorstandsRolle, Turnier, \
-    SparkassenJugendOpen, Stadtmeisterschaft
+    SparkassenJugendOpen, Stadtmeisterschaft, Vereinspokal
 
 
 # general flask stuff
@@ -180,6 +180,12 @@ def sparkassen_jugend_open():
 def stadtmeisterschaften():
     cups: list[Stadtmeisterschaft] = Stadtmeisterschaft.query.all()
     return render_template("Turniere/Stadtmeisterschaften.html", cups=cups)
+
+
+@app.route("/Turniere/Vereinspokal")
+def vereinspokal():
+    cups: list[Vereinspokal] = Vereinspokal.query.all()
+    return render_template("Turniere/Vereinspokal.html", cups=cups)
 
 
 # andere

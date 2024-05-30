@@ -40,7 +40,8 @@ class Person(db.Model):
 class Role(db.Model):
     id: Mapped[int] = Column(Integer, primary_key=True)
     name: str = Column(String)
-    accounts: Mapped[list["Account"]] = relationship("Account", "role_account_association_table", back_populates="roles")
+    accounts: Mapped[list["Account"]] = relationship("Account", "role_account_association_table",
+                                                     back_populates="roles")
 
 
 class Account(db.Model):
@@ -254,7 +255,6 @@ class StadtmeisterschaftSpiel(db.Model):
                 logging.error(f"Unexpected result {game_res}")
                 return "#000", "?"
 
-
     @property
     def spieler1(self):
         return StadtmeisterschaftTeilnehmer.query.get(self.spieler1_id)
@@ -262,3 +262,49 @@ class StadtmeisterschaftSpiel(db.Model):
     @property
     def spieler2(self):
         return StadtmeisterschaftTeilnehmer.query.get(self.spieler2_id)
+
+
+# Vereinspokal
+class Vereinspokal(Turnier):
+    id: Mapped[int] = Column(ForeignKey("turnier.id"), primary_key=True)
+    teilnehmer: Mapped[list["VereinspokalTeilnehmer"]] = relationship("VereinspokalTeilnehmer",
+                                                                      back_populates="turnier")
+
+    __mapper_args__ = {"polymorphic_identity": "vereinspokal"}
+
+    @property
+    def spiele(self) -> list["VereinspokalSpiel"]:
+        return sorted(VereinspokalSpiel.query.filter_by(turnier_id=self.id).all(), key=lambda x: x.runde)
+
+    @property
+    def runden(self) -> list[list["VereinspokalSpiel"]]:
+        runden: list[list["VereinspokalSpiel"]] = [[] for _ in range(self.spiele[-1].runde)]
+        for spiel in self.spiele:
+            runden[spiel.runde - 1].append(spiel)
+        return runden
+
+
+class VereinspokalSpiel(db.Model):
+    id: Mapped[int] = Column(Integer, primary_key=True)
+    turnier_id: Mapped[int] = Column(ForeignKey("vereinspokal.id"))
+    turnier: Mapped[Vereinspokal] = relationship("Vereinspokal")
+    weiss_id: Mapped[int] = Column(ForeignKey("vereinspokal_teilnehmer.id"))
+    weiss: Mapped["VereinspokalTeilnehmer"] = relationship("VereinspokalTeilnehmer", foreign_keys=[weiss_id])
+    schwarz_id: Mapped[int] = Column(ForeignKey("vereinspokal_teilnehmer.id"))
+    schwarz: Mapped["VereinspokalTeilnehmer"] = relationship("VereinspokalTeilnehmer", foreign_keys=[schwarz_id])
+    weiss_gewonnen: Mapped[bool] = Column(Boolean)
+    result: Mapped[None] = Column(Integer)
+    runde: Mapped[int] = Column(Integer)
+
+
+class VereinspokalTeilnehmer(db.Model):
+    id: Mapped[int] = Column(Integer, primary_key=True)
+    person_id: Mapped[int] = Column(ForeignKey("person.id"))
+    person: Mapped[Person] = relationship("Person")
+    turnier_id: Mapped[int] = Column(ForeignKey("vereinspokal.id"))
+    turnier: Mapped[Vereinspokal] = relationship("Vereinspokal", back_populates="teilnehmer")
+
+    @property
+    def spiele(self) -> list[VereinspokalSpiel]:
+        return Vereinspokal.query.filter_by(or_(self.id == VereinspokalSpiel.weiss_id,
+                                                self.id == VereinspokalSpiel.schwarz_id)).all()

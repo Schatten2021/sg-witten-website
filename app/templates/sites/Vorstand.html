@@ -13,7 +13,7 @@
         {% for role in roles %}
             <tr>
                 <td>{{ role.titel }}</td>
-                <td>{% if role.person != None %}{{ role.person.name }}{% else %}---{% endif %}</td>
+                <td>{% if role.person != None %}{{ role.person.name }}, {{ role.person.surname }}{% else %}---{% endif %}</td>
                 <td><a href="mailto:{{ role.email }}">{{ role.email }}</a></td>
             </tr>
         {% endfor %}
