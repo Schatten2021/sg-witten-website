@@ -293,13 +293,16 @@ class Vereinspokal(Turnier):
         if len(all_rounds) < 2:
             return all_rounds
         for i in reversed(range(len(all_rounds) - 1)):
+            prev_player_games: dict[VereinspokalTeilnehmer, int] = {}
+            for index, game in enumerate(all_rounds[i+1]):
+                prev_player_games[game.weiss] = index
+                prev_player_games[game.schwarz] = index + 1
+
             def get_index_of_game(game: VereinspokalSpiel) -> int:
-                target_player = game.weiss if game.weiss_gewonnen else game.schwarz
-                for index, next_round_game in enumerate(all_rounds[i + 1]):
-                    if target_player == next_round_game.weiss:
-                        return index * 2
-                    if target_player == next_round_game.schwarz:
-                        return index * 2 + 1
+                if game.weiss in prev_player_games:
+                    return prev_player_games[game.weiss]
+                elif game.schwarz in prev_player_games:
+                    return prev_player_games[game.schwarz]
                 return 0
 
             all_rounds[i] = sorted(all_rounds[i], key=get_index_of_game)
