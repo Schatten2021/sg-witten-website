@@ -295,8 +295,8 @@ class Vereinspokal(Turnier):
         for i in reversed(range(len(all_rounds) - 1)):
             prev_player_games: dict[VereinspokalTeilnehmer, int] = {}
             for index, game in enumerate(all_rounds[i+1]):
-                prev_player_games[game.weiss] = index
-                prev_player_games[game.schwarz] = index + 1
+                prev_player_games[game.weiss] = index * 2
+                prev_player_games[game.schwarz] = index * 2 + 1
 
             def get_index_of_game(game: VereinspokalSpiel) -> int:
                 if game.weiss in prev_player_games:
