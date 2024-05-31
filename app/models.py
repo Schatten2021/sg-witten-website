@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy import or_, Column, Integer, ForeignKey, Boolean, DateTime, Float, String
 from app import db
+import re
 
 
 class Person(db.Model):
@@ -32,6 +33,12 @@ class Person(db.Model):
     @property
     def vorstands_rollen(self) -> list["VorstandsRolle"]:
         return VorstandsRolle.query.filter_by(person_id=self.id).all()
+
+    @property
+    def shortened_surname(self) -> str:
+        surnames = re.split(r"[- ]", self.surname)
+        letters = [surname[0].upper() for surname in surnames if len(surname) > 0]
+        return "".join(letters)
 
 
 #
@@ -278,10 +285,26 @@ class Vereinspokal(Turnier):
 
     @property
     def runden(self) -> list[list["VereinspokalSpiel"]]:
-        runden: list[list["VereinspokalSpiel"]] = [[] for _ in range(self.spiele[-1].runde)]
+        all_rounds: list[list["VereinspokalSpiel"]] = [[] for _ in range(self.spiele[-1].runde)]
         for spiel in self.spiele:
-            runden[spiel.runde - 1].append(spiel)
-        return runden
+            all_rounds[spiel.runde - 1].append(spiel)
+
+        # go through all rounds except last one.
+        if len(all_rounds) < 2:
+            return all_rounds
+        for i in reversed(range(len(all_rounds) - 1)):
+            def get_index_of_game(game: VereinspokalSpiel) -> int:
+                target_player = game.weiss if game.weiss_gewonnen else game.schwarz
+                for index, next_round_game in enumerate(all_rounds[i + 1]):
+                    if target_player == next_round_game.weiss:
+                        return index * 2
+                    if target_player == next_round_game.schwarz:
+                        return index * 2 + 1
+                return 0
+
+            all_rounds[i] = sorted(all_rounds[i], key=get_index_of_game)
+
+        return all_rounds
 
 
 class VereinspokalSpiel(db.Model):

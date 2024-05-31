@@ -18,11 +18,11 @@
                         {% for spiel in runde %}
                         	<tr>
                                 <td style="background-color: {% if spiel.weiss_gewonnen %}#050{% else %}#500{% endif %}">
-                                    {{ spiel.weiss.person.name }}, {{ spiel.weiss.person.surname }}
+                                    {{ spiel.weiss.person.shortened_surname }}. {{ spiel.weiss.person.name }}
                                 </td>
                                 <td style="text-align: center">{% if spiel.weiss_gewonnen %} 1 : 0 {% else %} 0 : 1 {% endif %} </td>
                                 <td style="background-color: {% if spiel.weiss_gewonnen %}#500{% else %}#050{% endif %}">
-                                    {{ spiel.schwarz.person.name }}, {{ spiel.schwarz.person.surname }}
+                                    {{ spiel.schwarz.person.shortened_surname }}. {{ spiel.schwarz.person.name }}
                                 </td>
                             </tr>
                         {% endfor %}
