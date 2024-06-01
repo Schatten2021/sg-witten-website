@@ -35,6 +35,10 @@ class Person(db.Model):
         return VorstandsRolle.query.filter_by(person_id=self.id).all()
 
     @property
+    def vereinspokal_teilnahmen(self) -> list["VereinspokalTeilnehmer"]:
+        return VereinspokalTeilnehmer.query.filter_by(person_id=self.id).all()
+
+    @property
     def shortened_surname(self) -> str:
         surnames = re.split(r"[- ]", self.surname)
         letters = [surname[0].upper() for surname in surnames if len(surname) > 0]
@@ -63,6 +67,10 @@ class Account(db.Model):
     def is_admin(self) -> bool:
         admin_role: Role = Role.query.first()
         return admin_role is not None and admin_role in self.roles
+
+    @property
+    def authentication_requests(self) -> list["AuthenticationRequest"]:
+        return AuthenticationRequest.query.filter_by(account_id=self.person.id).all()
 
     def set_password(self, password: str):
         self.password = generate_password_hash(password)

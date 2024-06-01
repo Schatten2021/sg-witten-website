@@ -31,6 +31,9 @@ def before_request():
             f"Alle Daten auf dieser Seite sind dem Original entnommen. "
             f"Quellcode auf <a href=\"https://github.com/Schatten2021/sg-witten-website\">GitHub</a>",
             "warning")
+    path = request.path
+    if path != "/" and path.endswith("/"):
+        return redirect(path[:-1], code=301)
 
 
 @app.route('/')

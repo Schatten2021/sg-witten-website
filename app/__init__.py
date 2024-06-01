@@ -8,8 +8,6 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from os import environ
 
-from sqlalchemy.testing.pickleable import User
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 app.config["SECRET_KEY"] = ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits)

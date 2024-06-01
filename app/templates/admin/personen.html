@@ -4,7 +4,10 @@
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr)); gap: 1rem">
     {% for person in people %}
     	<div class="card">
-            <div class="card-header"><a class="text-reset" href="/admin/personen/{{ person.id }}">{{ person.name }}, {{ person.surname }}</a></div>
+            <div class="card-header">
+                <a class="text-reset" href="/admin/personen/{{ person.id }}">{{ person.name }}, {{ person.surname }}</a>
+                <i class="fa-solid fa-trash text-reset btn" style="float: right; margin: auto" role="button" onclick="deleteUser({{ person.id }}, '{{ person.name }}', '{{ person.surname }}')"></i>
+            </div>
             <ul class="list-group list-group-flush">
                 {% if person.vorstands_rollen %}
                     {% for rolle in person.vorstands_rollen %}
@@ -42,4 +45,14 @@
             </button>
         </form>
     </div>
+{% endblock %}
+{% block javascript %}
+	<script>
+        function deleteUser(id, name, surname) {
+            if (!window.confirm(`Do you really want to delete ${surname} ${name}? This action cannot be undone and will delete any associated data including their Account!`)) {
+                return;
+            }
+            window.location = `/admin/personen/delete?id=${id}`
+        }
+    </script>
 {% endblock %}

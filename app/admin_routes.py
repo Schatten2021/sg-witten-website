@@ -77,6 +77,31 @@ def add_person():
     return redirect(f"/admin/personen/{person.id}")
 
 
+@bp.route("/personen/delete")
+def delete_person():
+    if "id" not in request.args:
+        flash("id must be provided", "error")
+        return redirect(f"/admin/personen")
+    person: Person = Person.query.get(request.args["id"])
+    if person is None:
+        flash("Person not found", "error")
+        return redirect(f"/admin/personen")
+
+    for teilnahme in person.vereinspokal_teilnahmen + person.sparkassen_jugend_open_teilnahmen + person.stadtmeisterschaft_teilnahmen + person.vorstands_rollen + person.mannschaftsspieler:
+        teilnahme.person_id = -1
+    account: Account = person.account
+    if account is not None:
+        requests = account.authentication_requests
+        for req in requests:
+            db.session.delete(req)
+        db.session.delete(account)
+    db.session.delete(person)
+    db.session.commit()
+
+    flash(f"removed person {person.name}, {person.surname}.", "success")
+    return redirect(f"/admin/personen")
+
+
 # Mannschaften
 @bp.route("/mannschaften")  # für Mannschaftsbetrieb
 def mannschaften():
