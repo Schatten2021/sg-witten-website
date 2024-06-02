@@ -3,7 +3,7 @@
 	<h1>Sparkassen Jugend Open (Schulschach-Cup)</h1>
     {% for cup in cups %}
         <section>
-            <h2>{{ cup.turnier.date.strftime("%Y") }}</h2>
+            <h2>{{ cup.date.strftime("%Y") }}</h2>
             <p>
                 {{ cup.artikel.replace("\n", "</p><p>")|safe }}
                 {# TODO: pls remove |safe #}

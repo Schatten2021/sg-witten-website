@@ -139,6 +139,12 @@ class Turnier(db.Model):
     id: Mapped[int] = Column(Integer, primary_key=True)
     name: Mapped[str] = Column(String)
     date: Mapped[datetime] = Column(DateTime)
+    turnier_type: Mapped[str] = Column(String, default="turnier")
+
+    __mapper_args__ = {
+        "polymorphic_identity": "turnier",
+        "polymorphic_on": turnier_type,
+    }
 
 
 class Verein(db.Model):
@@ -147,7 +153,7 @@ class Verein(db.Model):
 
 
 # Sparkassen Jugend Open
-class SparkassenJugendOpen(db.Model):
+class SparkassenJugendOpen(Turnier):
     id: Mapped[int] = Column(ForeignKey("turnier.id"), primary_key=True)
     turnier: Mapped[Turnier] = relationship("Turnier")
     artikel: Mapped[str] = Column(String)
@@ -168,6 +174,8 @@ class SparkassenJugendOpen(db.Model):
                 res[teilnehmer.Jahrgang].append(teilnehmer)
         return dict(sorted(res.items()))
 
+    __mapper_args__ = {"polymorphic_identity": "sparkassen_jugend_open"}
+
 
 class SparkassenJugendOpenTeilnehmer(db.Model):
     id: Mapped[int] = Column(Integer, primary_key=True)
@@ -182,7 +190,7 @@ class SparkassenJugendOpenTeilnehmer(db.Model):
 
 
 # Stadtmeisterschaft
-class Stadtmeisterschaft(db.Model):
+class Stadtmeisterschaft(Turnier):
     id: Mapped[int] = Column(ForeignKey("turnier.id"), primary_key=True)
     turnier: Mapped[Turnier] = relationship()
     teilnehmer: Mapped[list["StadtmeisterschaftTeilnehmer"]] = relationship("StadtmeisterschaftTeilnehmer",
@@ -191,6 +199,8 @@ class Stadtmeisterschaft(db.Model):
     @property
     def teilnehmer_liste(self) -> list["StadtmeisterschaftTeilnehmer"]:
         return sorted(self.teilnehmer, key=lambda x: x.rang)
+
+    __mapper_args__ = {"polymorphic_identity": "stadtmeisterschaft"}
 
 
 class StadtmeisterschaftTeilnehmer(db.Model):
