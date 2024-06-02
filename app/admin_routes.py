@@ -34,7 +34,8 @@ def index():
 
 @bp.route("/personen")
 def personen():
-    people: list[Person] = sorted(Person.query.all(), key=lambda p: p.name.lower() + " " + p.surname.lower())
+    people: list[Person] = sorted(Person.query.filter(Person.id >= 0).all(),
+                                  key=lambda p: p.name.lower() + " " + p.surname.lower())
     return render_template("admin/personen.html", people=people)
 
 
@@ -140,7 +141,7 @@ def player_down(player_id):
     team: Mannschaft = player.mannschaft
     players: list[Mannschaftsspieler] = sorted(team.spieler)
     team_index: int = players.index(player)
-    if team_index == (len(players)-1):
+    if team_index == (len(players) - 1):
         flash(f"Player {player.person.surname} {player.person.name} already at the bottom")
         return redirect(request.referrer)
     next_player = players[team_index + 1]
@@ -180,7 +181,6 @@ def edit_turnier():
     return redirect("/admin/turniere")
 
 
-@bp.route("/turniere/<int:id>")
 @bp.route("/turniere/sparkassen_jugend_open")
 @bp.route("/turniere/sparkassen_jugend_open/<int:id>")
 @bp.route("/turniere/vereinsturniere")

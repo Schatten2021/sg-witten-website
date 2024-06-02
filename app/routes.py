@@ -32,7 +32,7 @@ def before_request():
             f"Quellcode auf <a href=\"https://github.com/Schatten2021/sg-witten-website\">GitHub</a>",
             "warning")
     path = request.path
-    if path != "/" and path.endswith("/"):
+    if path != "/" and path.endswith("/") and path != "/admin/":
         return redirect(path[:-1], code=301)
 
 
