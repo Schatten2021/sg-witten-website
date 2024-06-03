@@ -57,9 +57,8 @@
                         <i class="fa-solid fa-user btn fs-1{% if request.endpoint in ["login", "signup"] %} active{% endif %}" role="button"></i>
                     </a>
                 {% else %}
-                    <a href="/logout" class="nav-item nav-link" onclick="confirm('logout?')">
-                        <i class="fa-solid fa-right-from-bracket btn fs-1"></i>
-                    </a>
+                    <button class="nav-item nav-link fa-solid fa-right-from-bracket btn fs-1"
+                            onclick="if(confirm('logout?')){window.location.href = '/logout'}"></button>
                 {% endif %}
             </div>
         </nav>

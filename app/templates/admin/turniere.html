@@ -10,7 +10,17 @@
                   data-date-month="{{ cup.date.month + 1 }}"
                   data-date-day="{{ cup.date.day + 1 }}"
                   action="/admin/turniere/edit">
-                <div class="card-header card-title">{{ cup.name }} <i class="fa-solid fa-pen btn" onclick="changeName()"></i></div>
+                <div class="card-header card-title">
+                    {% if isinstance(cup, Vereinspokal) %}
+                        <a href="/admin/turniere/turniere/vereinspokal/{{ cup.id }}">{{ cup.name }}</a>
+                    {% elif isinstance(cup, Stadtmeisterschaft) %}
+                        <a href="/admin/turniere/stadtmeisterschaft/{{ cup.id }}">{{ cup.name }}</a>
+                    {% elif isinstance(cup, SparkassenJugendOpen) %}
+                        <a href="/admin/turniere/sparkassen_jugend_open/{{ cup.id }}">{{ cup.name }}</a>
+                    {% else %}
+                        {{ cup.name }}
+                    {% endif %}
+                    <i class="fa-solid fa-pen btn" onclick="changeName()"></i></div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item">{{ cup.date.strftime("%d.%m.%Y") }}</li>
