@@ -2,12 +2,11 @@ from datetime import datetime
 
 from flask import Blueprint, render_template, flash, request
 from flask_login import current_user
-from jinja2 import TemplateNotFound
 
+from app import app, db
 from app.models import Account, Role, Person, Mannschaft, Mannschaftsspieler, Turnier, Vereinspokal, Stadtmeisterschaft, \
     StadtmeisterschaftTeilnehmer, SparkassenJugendOpen
 from app.routes import redirect
-from app import app, db
 
 bp = Blueprint('admin', __name__, url_prefix='/admin', template_folder="templates")
 
@@ -35,16 +34,6 @@ def before_request():
     if not current_user.is_authenticated:
         return render_template("Flask internals/404.html"), 404
     if Role.query.first() not in current_user.roles:
-        return render_template("Flask internals/404.html"), 404
-
-
-@bp.route("/")
-@bp.route("/index")
-def index():
-    try:
-        return render_template("admin/index.html")
-    except TemplateNotFound:
-        flash("template not found")
         return render_template("Flask internals/404.html"), 404
 
 
@@ -104,7 +93,12 @@ def delete_person():
         flash("Person not found", "error")
         return redirect(f"/admin/personen")
 
-    for teilnahme in person.vereinspokal_teilnahmen + person.sparkassen_jugend_open_teilnahmen + person.stadtmeisterschaft_teilnahmen + person.vorstands_rollen + person.mannschaftsspieler:
+    pokale: list[Turnier] = (person.vereinspokal_teilnahmen
+                             + person.sparkassen_jugend_open_teilnahmen
+                             + person.stadtmeisterschaft_teilnahmen
+                             + person.vorstands_rollen
+                             + person.mannschaftsspieler)
+    for teilnahme in pokale:
         teilnahme.person_id = -1
     account: Account = person.account
     if account is not None:
@@ -141,7 +135,7 @@ def player_up(player_id):
     previous = players[team_index - 1]
     player.ersatz, previous.ersatz = previous.ersatz, player.ersatz
     player.BrettNr, previous.BrettNr = previous.BrettNr, player.BrettNr
-    db.session.add_all([player, team])
+    db.session.add(team)
     db.session.commit()
     flash(f"updated successfully", "success")
     return redirect(request.referrer)
@@ -163,7 +157,7 @@ def player_down(player_id):
     next_player = players[team_index + 1]
     player.ersatz, next_player.ersatz = next_player.ersatz, player.ersatz
     player.BrettNr, next_player.BrettNr = next_player.BrettNr, player.BrettNr
-    db.session.add_all([player, team])
+    db.session.add(team)
     db.session.commit()
     flash(f"updated successfully", "success")
     return redirect(request.referrer)

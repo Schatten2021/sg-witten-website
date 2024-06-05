@@ -45,15 +45,8 @@
             console.debug(data)
             const header = form.children[0];
             header.innerHTML = `<input type="text" value="${data.name}" style="width: 100%" name="name">`;
-            {#const nameInput = header.children[0];#}
             const cardBody = form.children[1].children[0].children[0];
             cardBody.innerHTML = `<input type="date" value="${data.date.toISOString().slice(0, 10)}" name="date"><input type="number" value="${data.id}" name="id" hidden/>`;
-            {#const dateInput = cardBody.children[0];#}
-            {#form.addEventListener("submit", (e) => {#}
-            {#    e.preventDefault();#}
-            {#    const url = `/admin/turniere/edit?id=${data.id}&name=${nameInput.value}&date=${dateInput.value}`#}
-            {#    window.location = encodeURI(url)#}
-            {# }) #}
         }
     </script>
 {% endblock %}

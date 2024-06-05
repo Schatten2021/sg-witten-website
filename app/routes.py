@@ -2,13 +2,12 @@ import random
 import string
 from urllib.parse import quote
 
-from flask import render_template, flash, request, make_response
-from flask_login import current_user, login_user, logout_user
+from flask import make_response
+from flask_login import login_user, logout_user
 from flask_mail import Message
 
 from app import app, db, mail
-from app.models import Account, Person, AuthenticationRequest, Mannschaft, VorstandsRolle, Turnier, \
-    SparkassenJugendOpen, Stadtmeisterschaft, Vereinspokal
+from app.models import AuthenticationRequest, VorstandsRolle
 
 
 # general flask stuff
