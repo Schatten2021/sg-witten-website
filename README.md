@@ -46,4 +46,4 @@ If something else shows up, close whatever process is occupying localhost:5000 a
 Or you can change the target port by changing the port keyword for the `app.run(debug=True, host=127.0.0.1, port=5000)` function call to something else, like 8000.
 Then navigate to localhost:port
 
-Now create an account and change the entry in the role_account_association_table to the id of your user.
+Now create an account with the name "admin" and the surname "admin". The account with this name will automatically have the admin role.
