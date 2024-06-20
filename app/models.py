@@ -252,7 +252,7 @@ class StadtmeisterschaftSpiel(db.Model):
         if self.spieler1_id == player.id:
             return self.result
         elif self.spieler2_id == player.id:
-            return self.result
+            return -int(self.result)
         else:
             return None
 
