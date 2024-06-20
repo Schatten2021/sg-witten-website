@@ -21,7 +21,7 @@
                 {% endif %}
                 {% if person.stadtmeisterschaft_teilnahmen %}
                     {% for teilnahme in person.stadtmeisterschaft_teilnahmen %}
-                        <li class="list-group-item">Mitgespielt bei der <a class="card-link" href="/admin/stadtmeisterschaften/{{ teilnahme.turnier.id }}">{{ teilnahme.turnier.turnier.name }}</a></li>
+                        <li class="list-group-item">Mitgespielt bei der <a class="card-link" href="/admin/turniere/stadtmeisterschaft/{{ teilnahme.turnier.id }}">{{ teilnahme.turnier.turnier.name }}</a></li>
                     {% endfor %}
                 {% endif %}
                 {% if person.sparkassen_jugend_open_teilnahmen %}

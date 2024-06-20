@@ -5,7 +5,7 @@ from flask_login import current_user
 
 from app import app, db
 from app.models import Account, Role, Person, Mannschaft, Mannschaftsspieler, Turnier, Vereinspokal, Stadtmeisterschaft, \
-    StadtmeisterschaftTeilnehmer, SparkassenJugendOpen
+    StadtmeisterschaftTeilnehmer, SparkassenJugendOpen, Verein
 from app.routes import redirect
 
 bp = Blueprint('admin', __name__, url_prefix='/admin', template_folder="templates")
@@ -25,6 +25,7 @@ def jinja_environment_variables():
         "Stadtmeisterschaft": Stadtmeisterschaft,
         "StadtmeisterschaftTeilnehmer": StadtmeisterschaftTeilnehmer,
         "SparkassenJugendOpen": SparkassenJugendOpen,
+        "Verein": Verein,
     }
 
 
@@ -191,12 +192,24 @@ def edit_turnier():
     return redirect("/admin/turniere")
 
 
+@bp.route("/turniere/stadtmeisterschaft")
+def stadtmeisterschaften():
+    cups: list[Stadtmeisterschaft] = Stadtmeisterschaft.query.all()
+    # TODO implement
+    return ""
+
+@bp.route("/turniere/stadtmeisterschaft/<int:id>")
+def stadtmeisterschaft(id: int):
+    cup: Stadtmeisterschaft = Stadtmeisterschaft.query.get(id)
+    if cup is None:
+        flash(f"Stadtmeisterschaft {id} wurde nicht gefunden.")
+    return render_template("admin/stadtmeisterschaften_details.html", cup=cup)
+
+
 @bp.route("/turniere/sparkassen_jugend_open")
 @bp.route("/turniere/sparkassen_jugend_open/<int:id>")
 @bp.route("/turniere/vereinspokal")
 @bp.route("/turniere/vereinspokal/<int:id>")
-@bp.route("/turniere/stadtmeisterschaft")
-@bp.route("/turniere/stadtmeisterschaft/<int:id>")
 @bp.route("/teams")  # für Teams bei Turnieren
 @bp.route("/teams/<int:id>")
 def undefined(*args, **kwargs):
