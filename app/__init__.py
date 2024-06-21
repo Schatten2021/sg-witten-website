@@ -1,6 +1,7 @@
 import random
 import string
 
+import logging
 from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -13,6 +14,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 app.config["SECRET_KEY"] = ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits)
                                    for _ in range(64))
 app.secret_key = app.config['SECRET_KEY']
+
+
+@lambda _: _()
+def init():
+    missing = [elem for elem in ["MAIL_SERVER", "MAIL_USERNAME", "MAIL_PASSWORD"] if elem not in environ]
+    if len(missing) > 0:
+        raise Exception(f"Environment variable(s) {missing} not set")
+
 
 # EMAIL setup
 app.config["MAIL_SERVER"] = environ.get("MAIL_SERVER")
