@@ -8,7 +8,23 @@
         </tr>
         {% for cup in cups %}
         	<tr>
-                <td>{{ cup.name }}</td>
+                <td>
+                    {% if isinstance(cup, Stadtmeisterschaft) %}
+                        <a href="/Turniere/Stadtmeisterschaften#{{ cup.id }}">
+                            {{ cup.name }}
+                        </a>
+                    {% elif isinstance(cup, Vereinspokal) %}
+                        <a href="/Turniere/Vereinspokal#{{ cup.id }}">
+                            {{ cup.name }}
+                        </a>
+                    {% elif isinstance(cup, SparkassenJugendOpen) %}
+                        <a href="/Turniere/SparkassenJugendOpen#{{ cup.id }}">
+                            {{ cup.name }}
+                        </a>
+                    {% else %}
+                        {{ cup.name }}
+                    {% endif %}
+                </td>
                 <td>{{ cup.date.strftime("%d.%m.%Y") }}</td>
             </tr>
         {% endfor %}

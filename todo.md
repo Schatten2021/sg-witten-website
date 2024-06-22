@@ -1,6 +1,7 @@
 Pages that are still left to be done
 ----
 - admin page
+  - Vereinspokal
 - Vereinspokal
 - Kinderschach Verstärkung
 - Sparkassen Open

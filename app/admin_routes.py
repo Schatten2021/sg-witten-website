@@ -11,24 +11,6 @@ from app.routes import redirect
 bp = Blueprint('admin', __name__, url_prefix='/admin', template_folder="templates")
 
 
-@bp.context_processor
-def jinja_environment_variables():
-    return {
-        "isinstance": isinstance,
-        "Vereinspokal": Vereinspokal,
-        "Turnier": Turnier,
-        "Mannschaft": Mannschaft,
-        "Mannschaftsspieler": Mannschaftsspieler,
-        "Account": Account,
-        "Role": Role,
-        "Person": Person,
-        "Stadtmeisterschaft": Stadtmeisterschaft,
-        "StadtmeisterschaftTeilnehmer": StadtmeisterschaftTeilnehmer,
-        "SparkassenJugendOpen": SparkassenJugendOpen,
-        "Verein": Verein,
-    }
-
-
 @bp.before_request
 def before_request():
     # verify that user is an admin
@@ -197,6 +179,7 @@ def stadtmeisterschaften():
     cups: list[Stadtmeisterschaft] = Stadtmeisterschaft.query.all()
     # TODO implement
     return ""
+
 
 @bp.route("/turniere/stadtmeisterschaft/<int:id>")
 def stadtmeisterschaft(id: int):

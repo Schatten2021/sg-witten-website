@@ -16,7 +16,6 @@ Install Python 3, if necessary:
 
 Then create a Python venv using `python3 -m venv .venv` and activate it `source .venv/bin/activate`.
 Afterwards install the necessary dependencies `pip install -r requirements.txt`.
-Finally you can start the server by running `python main.py`.
 
 
 ### Windows
@@ -24,11 +23,13 @@ Install Python from [python.org](https://www.python.org/)
 
 Then create a Python venv by running `python -m venv .venv` and activate it with `.venv/Scripts/activate`.
 Now install the dependencies like this: `pip install -r requirements.txt`.
-Lastly start the server with `python main.py`.
 
 
 ### Afterwards
 
+When you have everything installed, you'll need to set all the required environment variables (`MAIL_SERVER`, `MAIL_USERNAME` and `MAIL_PASSWORD`) to their respective values.
+
+Lastly start the server with `python main.py`.
 ```
  * Serving Flask app 'app'
  * Debug mode: on
@@ -47,3 +48,6 @@ Or you can change the target port by changing the port keyword for the `app.run(
 Then navigate to localhost:port
 
 Now create an account with the name "admin" and the surname "admin". The account with this name will automatically have the admin role.
+
+
+For production I recommend using gunicorn, which can be installed via pip (`pip install gunicorn`).

@@ -10,6 +10,24 @@ from app import app, db, mail
 from app.models import AuthenticationRequest, VorstandsRolle
 
 
+@app.context_processor
+def jinja_environment_variables():
+    return {
+        "isinstance": isinstance,
+        "Vereinspokal": Vereinspokal,
+        "Turnier": Turnier,
+        "Mannschaft": Mannschaft,
+        "Mannschaftsspieler": Mannschaftsspieler,
+        "Account": Account,
+        "Role": Role,
+        "Person": Person,
+        "Stadtmeisterschaft": Stadtmeisterschaft,
+        "StadtmeisterschaftTeilnehmer": StadtmeisterschaftTeilnehmer,
+        "SparkassenJugendOpen": SparkassenJugendOpen,
+        "Verein": Verein,
+    }
+
+
 # general flask stuff
 def redirect(url, code: int = 301):
     response = make_response(render_template("Flask internals/redirect.html", url=url, code=code), code)

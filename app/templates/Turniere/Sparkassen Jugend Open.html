@@ -2,7 +2,7 @@
 {% block body %}
 	<h1>Sparkassen Jugend Open (Schulschach-Cup)</h1>
     {% for cup in cups %}
-        <section>
+        <section id="{{ cup.id }}">
             <h2>{{ cup.date.strftime("%Y") }}</h2>
             <p>
                 {{ cup.artikel.replace("\n", "</p><p>")|safe }}
