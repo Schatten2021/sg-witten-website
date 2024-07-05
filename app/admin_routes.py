@@ -4,8 +4,7 @@ from flask import Blueprint, render_template, flash, request
 from flask_login import current_user
 
 from app import app, db
-from app.models import Account, Role, Person, Mannschaft, Mannschaftsspieler, Turnier, Vereinspokal, Stadtmeisterschaft, \
-    StadtmeisterschaftTeilnehmer, SparkassenJugendOpen, Verein
+from app.models import Account, Role, Person, Mannschaft, Mannschaftsspieler, Turnier
 from app.routes import redirect
 
 bp = Blueprint('admin', __name__, url_prefix='/admin', template_folder="templates")

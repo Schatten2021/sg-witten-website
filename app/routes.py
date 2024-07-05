@@ -7,23 +7,19 @@ from flask_login import login_user, logout_user
 from flask_mail import Message
 
 from app import app, db, mail
-from app.models import AuthenticationRequest, VorstandsRolle
+from app.models import AuthenticationRequest, VorstandsRolle, Verein
 
 
 @app.context_processor
 def jinja_environment_variables():
     return {
         "isinstance": isinstance,
-        "Vereinspokal": Vereinspokal,
         "Turnier": Turnier,
         "Mannschaft": Mannschaft,
         "Mannschaftsspieler": Mannschaftsspieler,
         "Account": Account,
         "Role": Role,
         "Person": Person,
-        "Stadtmeisterschaft": Stadtmeisterschaft,
-        "StadtmeisterschaftTeilnehmer": StadtmeisterschaftTeilnehmer,
-        "SparkassenJugendOpen": SparkassenJugendOpen,
         "Verein": Verein,
     }
 
@@ -188,24 +184,6 @@ def logout():
 def turniere():
     cups: list[Turnier] = Turnier.query.all()
     return render_template("Turniere/Alle.html", cups=cups)
-
-
-@app.route("/Turniere/SparkassenJugendOpen")
-def sparkassen_jugend_open():
-    cups: list[SparkassenJugendOpen] = SparkassenJugendOpen.query.all()
-    return render_template("Turniere/Sparkassen Jugend Open.html", cups=cups)
-
-
-@app.route("/Turniere/Stadtmeisterschaften")
-def stadtmeisterschaften():
-    cups: list[Stadtmeisterschaft] = Stadtmeisterschaft.query.all()
-    return render_template("Turniere/Stadtmeisterschaften.html", cups=cups)
-
-
-@app.route("/Turniere/Vereinspokal")
-def vereinspokal():
-    cups: list[Vereinspokal] = Vereinspokal.query.all()
-    return render_template("Turniere/Vereinspokal.html", cups=cups)
 
 
 # andere

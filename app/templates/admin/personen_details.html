@@ -52,50 +52,6 @@
             {% endfor %}
         </div>
     {% endif %}
-    {% if person.stadtmeisterschaft_teilnahmen %}
-    	<div id="stadtmeisterschaften">
-            <h2>Stadtmeisterschafts-Teilnahmen</h2>
-            {% for teilnahme in person.stadtmeisterschaft_teilnahmen %}
-                <div class="stadtmeisterschaftsteilnahme">
-                    <h3><a href="/admin/turniere/stadtmeisterschaften/{{ teilnahme.turnier.id }}">{{ teilnahme.turnier.turnier.name }}</a></h3>
-                    <p>Rang: {{ teilnahme.rang }}</p>
-                    <p>DWZ (damals): {{ teilnahme.dwz }}</p>
-                    <p>Buchholz: {{ teilnahme.buchholz }}</p>
-                    <p>Punkte: {{ teilnahme.punkte }}</p>
-                    <p>Verein: <a href="/admin/teams/{{ teilnahme.verein.id }}">{{ teilnahme.verein.name }}</a></p>
-                    <p>Freispiele: {{ teilnahme.freispiele }}</p>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">Gegner</th>
-                                <th scope="col">Ergebnis</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for spiel in teilnahme.spiele %}
-                                <tr>
-                                    {% set other = spiel.get_other(teilnahme) %}
-                                    <td><a href="{{ other.person.id }}">{{ other.person.name }}, {{ other.person.surname }}</a></td>
-                                    {% set col, string = spiel.get_result_str(teilnahme) %}
-                                    <td style="background-color: {{ col }}">{{ string }}</td>
-                                </tr>
-                            {% endfor %}
-
-                        </tbody>
-                    </table>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-    {% if person.sparkassen_jugend_open_teilnahmen %}
-    	<h2>Sparkassen Jugend Open Teilnahmen</h2>
-        {% for teilnahme in person.sparkassen_jugend_open_teilnahmen %}
-        	<h3><a href="/admin/turniere/sparkassen_jugend_open/{{ teilnahme.turnier.id }}">{{ teilnahme.turnier.turnier.name }}</a></h3>
-            <p>Punkte: {{ teilnahme.points }}</p>
-            <p>Jahrgang: U {{ teilnahme.Jahrgang }}</p>
-            <p>Verein: <a href="/admin/teams/{{ teilnahme.verein.id }}">{{ teilnahme.verein.name }}</a></p>
-        {% endfor %}
-    {% endif %}
 {% endblock %}
 
 {% block javascript %}
