@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% from "Turniere/Schweizer.html" import render_schweizer %}
+{% block body %}
+	<h1>{{ cup.name }}</h1>
+    <div>
+        {% if isinstance(cup, SchweizerTurnier) %}
+            {{ render_schweizer(cup) }}
+        {% elif isinstance(cup, FFATurnier) %}
+            {# TODO: implement render #}
+            {{ cup.description }}
+        {% elif isinstance(cup, KOTurnier) %}
+            {# TODO: implement render #}
+            {{ cup.description }}
+        {% endif %}
+    </div>
+{% endblock %}

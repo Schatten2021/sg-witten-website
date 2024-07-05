@@ -7,7 +7,7 @@ from flask_login import login_user, logout_user
 from flask_mail import Message
 
 from app import app, db, mail
-from app.models import AuthenticationRequest, VorstandsRolle, Verein
+from app.models import AuthenticationRequest, VorstandsRolle, Verein, SchweizerTurnier, KOTurnier, FFATurnier
 
 
 @app.context_processor
@@ -17,6 +17,10 @@ def jinja_environment_variables():
         "Turnier": Turnier,
         "Mannschaft": Mannschaft,
         "Mannschaftsspieler": Mannschaftsspieler,
+        "SchweizerTurnier": SchweizerTurnier,
+        "VorstandsRolle": VorstandsRolle,
+        "KOTurnier": KOTurnier,
+        "FFATurnier": FFATurnier,
         "Account": Account,
         "Role": Role,
         "Person": Person,
@@ -184,6 +188,12 @@ def logout():
 def turniere():
     cups: list[Turnier] = Turnier.query.all()
     return render_template("Turniere/Alle.html", cups=cups)
+
+
+@app.route("/Turniere/<int:id>")
+def turnier_details(id: int):
+    cup: Turnier = Turnier.query.filter_by(id=id).first()
+    return render_template("Turniere/TurnierDetails.html", cup=cup)
 
 
 # andere

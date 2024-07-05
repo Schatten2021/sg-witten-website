@@ -24,6 +24,12 @@
                 <div class="collapse navbar-collapse" id="navbar">
                     <ul class="navbar-nav me-auto mb-2 mg-lg-0 nav-fill w-100">
                         <li class="nav-item dropdown">
+                            <a class="nav-item">
+                                <a class="nav-link{% if request.endpoint in ["turniere", "turnier_details"] %} active{% endif %}"
+                                   href="/Turniere"
+                                >Turniere</a>
+                            </a>
+                        {#
                             <button class="nav-link dropdown-toggle{% if request.endpoint in ["turniere", "sparkassen_jugend_open", "vereinsturniere", "stadtmeisterschaften"] %} active{% endif %}" data-bs-toggle="dropdown" aria-expanded="false">
                                 Turniere
                             </button>
@@ -33,6 +39,7 @@
                                 <li><a class="dropdown-item{% if request.endpoint == "vereinspokal" %} active{% endif %}" href="/Turniere/Vereinspokal">Vereinspokal</a></li>
                                 <li><a class="dropdown-item{% if request.endpoint == "stadtmeisterschaften" %} active{% endif %}" href="/Turniere/Stadtmeisterschaften">Stadtmeisterschaften</a></li>
                             </ul>
+                         #}
                         </li>
                         <li class="nav-item">
                             <a class="nav-link{% if request.endpoint == 'mannschaftsbetrieb' %} active{% endif %}" href="/Mannschaftsbetrieb">Mannschaftsbetrieb</a>

@@ -3,42 +3,12 @@
 	<h1>Turniere</h1>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr)); gap: 1rem">
         {% for cup in cups %}
-        	<form class="card"
-                  data-id="{{ cup.id }}"
-                  data-name="{{ cup.name }}"
-                  data-date-year="{{ cup.date.year }}"
-                  data-date-month="{{ cup.date.month + 1 }}"
-                  data-date-day="{{ cup.date.day + 1 }}"
-                  action="/admin/turniere/edit">
+        	<div class="card">
                 <div class="card-header card-title">
-                    {{ cup.name }}
-                    <i class="fa-solid fa-pen btn" onclick="changeName()"></i></div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">{{ cup.date.strftime("%d.%m.%Y") }}</li>
-                    </ul>
+                        <a href="/admin/turniere/{{ cup.id }}">{{ cup.name }}</a>
+                    <input type="submit" HIDDEN="hidden">
                 </div>
-                <input type="submit" HIDDEN="hidden">
-            </form>
+            </div>
         {% endfor %}
     </div>
-{% endblock %}
-{% block javascript %}
-	<script>
-        function changeName(e) {
-            e = e || window.event;
-            e = e.target || e.srcElement;
-            const form = e?.parentElement?.parentElement;
-            const data = {
-                "id": form.dataset.id,
-                "name": form.dataset.name,
-                "date": new Date(form.dataset.dateYear, form.dataset.dateMonth, form.dataset.dateDay)
-            }
-            console.debug(data)
-            const header = form.children[0];
-            header.innerHTML = `<input type="text" value="${data.name}" style="width: 100%" name="name">`;
-            const cardBody = form.children[1].children[0].children[0];
-            cardBody.innerHTML = `<input type="date" value="${data.date.toISOString().slice(0, 10)}" name="date"><input type="number" value="${data.id}" name="id" hidden/>`;
-        }
-    </script>
 {% endblock %}

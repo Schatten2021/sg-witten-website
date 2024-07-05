@@ -4,14 +4,12 @@
     <table class="table">
         <tr>
             <th scope="col">Turnier</th>
-            <th scope="col">Datum</th>
         </tr>
         {% for cup in cups %}
         	<tr>
                 <td>
-                    {{ cup.name }}
+                    <a href="/Turniere/{{ cup.id }}">{{ cup.name }}</a>
                 </td>
-                <td>{{ cup.date.strftime("%d.%m.%Y") }}</td>
             </tr>
         {% endfor %}
     </table>
