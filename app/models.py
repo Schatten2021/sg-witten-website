@@ -128,7 +128,7 @@ class Turnier(db.Model):
     id: Mapped[int] = Column(Integer, primary_key=True)
     name: Mapped[str] = Column(String)
     description: Mapped[str] = Column(String)
-    teilnehmer: Mapped["Teilnehmer"] = relationship("Teilnehmer")
+    teilnehmer: Mapped[list["Teilnehmer"]] = relationship("Teilnehmer")
     # jeder gegen jeden; Schweizer; K.O.
     runden_art: Mapped[str] = Column(String)
 
@@ -171,6 +171,11 @@ class Teilnehmer(db.Model):
     turnier_type: Mapped[str] = Column(String)
     vereins_id: Mapped[int] = Column(ForeignKey("verein.id"))
     verein: Mapped["Verein"] = relationship("Verein")
+
+    @property
+    def games(self):
+        return Game.query.filter_by(or_(Game.player1 == self, Game.player2 == self)).all()
+
     __mapper_args__ = {
         "polymorphic_identity": "Teilnehmer",
         "polymorphic_on": turnier_type,
@@ -211,6 +216,7 @@ class Verein(db.Model):
 
 class Game(db.Model):
     id: Mapped[int] = Column(Integer, primary_key=True)
+    result: Mapped[int] = Column(Integer)
     player1_id: Mapped[int] = Column(ForeignKey("teilnehmer.id"))
     player1: Mapped[Teilnehmer] = relationship("Teilnehmer", foreign_keys=[player1_id])
     player2_id: Mapped[int] = Column(ForeignKey("teilnehmer.id"))

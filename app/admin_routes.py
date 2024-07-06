@@ -1,10 +1,12 @@
+import re
 from datetime import datetime
 
 from flask import Blueprint, render_template, flash, request
 from flask_login import current_user
 
 from app import app, db
-from app.models import Account, Role, Person, Mannschaft, Mannschaftsspieler, Turnier
+from app.models import Account, Role, Person, Mannschaft, Mannschaftsspieler, Turnier, Teilnehmer, Verein, FFATurnier, \
+    SchweizerTurnier, KOTurnier, Game
 from app.routes import redirect
 
 bp = Blueprint('admin', __name__, url_prefix='/admin', template_folder="templates")
@@ -151,10 +153,55 @@ def turniere():
     return render_template("admin/turniere.html", cups=cups)
 
 
-@bp.route("/turniere/<int:id>")
+@bp.route("/turniere/<int:id>", methods=["POST", "GET"])
 def edit_turnier(id: int):
     cup: Turnier = Turnier.query.get(id)
-    return render_template("admin/turnier_details.html", cup=cup)
+    if request.method == "GET":
+        return render_template("admin/turnier_details.html", cup=cup)
+    try:
+        contestants_ids: set[int] = {int(value) for key, value in request.form.items()
+                                     if key.startswith("teilnehmer")}
+    except ValueError:
+        flash("teilnehmerID ungültig!", "error")
+        return 400
+    for teilnehmer in cup.teilnehmer:
+        db.session.delete(teilnehmer)
+        for game in Game.query.filter_by(player1=teilnehmer).all():
+            db.session.delete(game)
+    teilnehmer: list[Teilnehmer] = list()
+    for id in contestants_ids:
+        person: Person = Person.query.get(id)
+        if person is None:
+            flash(f"Person {id} not found")
+            return 404
+        contestant = Teilnehmer(person=person,
+                                turnier=cup,
+                                verein=Verein.query.first())
+        teilnehmer.append(contestant)
+    cup.teilnehmer = teilnehmer
+    match request.form.get("turnier_type"):
+        case "jeder gegen jeden":
+            cup.__class__ = FFATurnier
+        case "Schweizer":
+            cup.__class__ = SchweizerTurnier
+        case "K.O.":
+            cup.__class__ = KOTurnier
+        case _:
+            cup.__class__ = Turnier
+    games = {(key[len("game "):key.index("-")], key[key.index("-") + 1:]): value
+             for key, value in request.form.items()
+             if re.match(r"game [0-9]*-[0-9]", key)
+             }
+    for (player1_index, player2_index), result in games.items():
+        if result == "":
+            continue
+        player1: Teilnehmer = teilnehmer[int(player1_index)]
+        player2: Teilnehmer = teilnehmer[int(player2_index)]
+        game: Game = Game(player1=player1, player2=player2, result=int(result))
+        db.session.add(game)
+    print(games)
+    db.session.commit()
+    return request.form
 
 
 @bp.route("/teams")  # für Teams bei Turnieren
