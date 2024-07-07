@@ -12,7 +12,7 @@
             background-color: #0A0 !important;
         }
         .remi {
-            background-color: #00A !important;
+            background-color: #AA0 !important;
         }
         .lost {
             background-color: #A00 !important;
@@ -45,11 +45,15 @@
                 <thead>
                     <tr>
                         <th scope="col">Person</th>
+                        <th scope="col">Verein</th>
                     </tr>
                 </thead>
                 <tbody id="personen-table-body">
                     <tr>
-                        <td class="btn" onclick="addPerson()">+</td>
+                        <td><button class="btn" onclick="addPerson()" type="button">
+                            <i class="fa-solid fa-user-plus fa-xl"></i>
+                        </button></td>
+                        <td></td>
                     </tr>
                 </tbody>
             </table>
@@ -68,10 +72,15 @@
                     <option value="1">1</option>
                     <option value="2">+</option>
                 </select>
+                <select id="all_teams">
+                    {% for team in Verein.query.all() %}
+                        <option value="{{ team.id }}">{{ team.name }}</option>
+                    {% endfor %}
+                </select>
             </label>
             </div>
         </div>
-        <table id="legende" class="table table-bordered">
+        <!--<table id="legende" class="table table-bordered">
             <thead>
                 <tr>
                     <td>Symbol</td>
@@ -100,7 +109,7 @@
                     <td>kampflose Niederlage</td>
                 </tr>
             </tbody>
-        </table>
+        </table>-->
         <div id="games">
             {# TODO: game input #}
         </div>
@@ -114,6 +123,7 @@
         const games = document.getElementById("games")
         const cup_type_input = document.getElementById("turnier-art-select")
         const personDropdownBP = document.getElementById("all_people")
+        const teamDropdownBP = document.getElementById("all_teams")
         const resultDropdownBP = document.getElementById("possible_game_outcomes")
         cup_type_input.addEventListener("change", () => {
             switch (cup_type_input.value) {
@@ -128,17 +138,29 @@
             const addRow = personenDiv.children[personenDiv.children.length - 1];
             const newPerson = document.createElement("tr")
             const personDropdown = personDropdownBP.cloneNode(true)
-            console.debug(personDropdown.style)
-            console.debug(personDropdownBP)
+            const teamDropdown = teamDropdownBP.cloneNode(true)
+
             personDropdown.name = "teilnehmer" + (personenDiv.children.length - 1);
             personDropdown.id = "";
             personDropdown.addEventListener("change", updatePeople)
+
+            teamDropdown.name = `teilnehmer${personenDiv.children.length - 1}-team`;
+            teamDropdown.id = "";
+
             newPerson.appendChild(document.createElement("td")).appendChild(personDropdown)
+            newPerson.appendChild(document.createElement("td")).appendChild(teamDropdown)
+            const personTableHeader = personenDiv.parentElement.children[0].children[0]
+            for (let i = 2; i < personTableHeader.children.length; i++) {
+                newPerson.appendChild(document.createElement("td"));
+            }
             personenDiv.insertBefore(newPerson, addRow)
             //TODO: add Verein selection
             //TODO: depending on the current cup type change the generated html
+            updatePeople()
         }
         function updatePeople() {
+            if (cup_type_input.value === "jeder gegen jeden")
+                renderFFA()
             //TODO: implement checking and appropriate change of name update method
         }
         function renderFFA() {
@@ -147,7 +169,7 @@
             console.debug("rendering FFA")
             let selectedPeople = []
             for (let i = 0; i < personenDiv.children.length - 1; i++) {
-                const elem = personenDiv.children[i].firstChild.firstChild
+                const elem = personenDiv.children[i].children[0].children[0]
                 const selectedOption = elem.options[elem.selectedIndex].text
                 selectedPeople.push(selectedOption)
             }
@@ -161,6 +183,7 @@
                 currentHeader.scope = "col";
                 topRow.appendChild(currentHeader);
             }
+            topRow.innerHTML += "<th class='ffa-name-header' scope='col'>Spielfrei</th>"
             table.appendChild(topRow)
 
             // generate rest of table
@@ -174,6 +197,7 @@
                     const currentElement = document.createElement("td");
                     if (i === j) {
                         currentElement.innerText = "X";
+                        currentElement.style.background = "#00A";
                     } else {
                         const dropdown = resultDropdownBP.cloneNode(true);
                         dropdown.id = "";
@@ -206,21 +230,54 @@
                         dropdown.addEventListener("change", () => {
                             const opposite = idkWhatToNameThis[dropdown.value]
                             dropdown.className = opposite.class
-                            table.children[j+1].children[i+1].firstChild.value = opposite.opposite;
-                            table.children[j+1].children[i+1].firstChild.className = idkWhatToNameThis[opposite.opposite].class
+                            table.children[j+1].children[i+1].children[0].value = opposite.opposite;
+                            table.children[j+1].children[i+1].children[0].className = idkWhatToNameThis[opposite.opposite].class
                         })
                         dropdown.name = `game ${i}-${j}`
                         currentElement.appendChild(dropdown)
                     }
                     currentRow.appendChild(currentElement)
                 }
+                const spielfreiInput = document.createElement("input");
+                spielfreiInput.type = "checkbox";
+                spielfreiInput.name = `player-${i}-spielfrei`
+                currentRow.appendChild(document.createElement("td")).appendChild(spielfreiInput)
                 table.appendChild(currentRow)
             }
             games.innerHTML = "";
             games.appendChild(table)
 
             //TODO: change personen input
+            addPersonInfoColumns("Punkte", "Rang")
         }
-        cup_type_input.select()
+        function addPersonInfoColumns(...columnNames) {
+            //headers
+            const tableHeader = personenDiv.parentElement.children[0].children[0];
+            for (let i = 2; i < tableHeader.childNodes.length; i++) {
+                tableHeader.removeChild(tableHeader.childNodes[i]);
+            }
+            for (let i = 0; i < columnNames.length; i++) {
+                const header = document.createElement("th");
+                header.scope = "col";
+                header.innerText = columnNames[i];
+                tableHeader.appendChild(header);
+            }
+
+            //table body
+            for (let i = 0; i < personenDiv.children.length; i++) {
+                const currentRow = personenDiv.children[i];
+                let counter = 0;
+                while (currentRow.children.length > 2) {
+                    currentRow.removeChild(currentRow.children[2])
+                }
+                counter = 0;
+                for (let j = 0; j < columnNames.length; j++) {
+                    const element = document.createElement("td")
+                    element.innerText = columnNames[j];
+                    currentRow.appendChild(element);
+                    counter++;
+                }
+            }
+        }
     </script>
 {% endblock %}

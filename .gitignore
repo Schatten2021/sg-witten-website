@@ -5,3 +5,4 @@
 /migrations_old/
 /instance_old/
 /.$Database ER.drawio.bkp
+**.env
