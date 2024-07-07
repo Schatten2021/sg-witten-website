@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% from "Turniere/Schweizer.html" import render_schweizer %}
+{% from "Turniere/Jeder gegen Jeden.html" import renderFFA %}
 {% block body %}
 	<h1>{{ cup.name }}</h1>
     <div>
         {% if isinstance(cup, SchweizerTurnier) %}
             {{ render_schweizer(cup) }}
         {% elif isinstance(cup, FFATurnier) %}
-            {# TODO: implement render #}
-            {{ cup.description }}
+            {{ renderFFA(cup) }}
         {% elif isinstance(cup, KOTurnier) %}
             {# TODO: implement render #}
             {{ cup.description }}

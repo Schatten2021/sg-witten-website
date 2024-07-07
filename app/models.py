@@ -183,6 +183,10 @@ class Teilnehmer(db.Model):
 
 
 class FFATeilnehmer(Teilnehmer):
+    def get_result_against(self, other: "FFATeilnehmer") -> int | None:
+        game = Game.query.filter_by(player1=self, player2=other).first()
+        return game.result if game is not None else None
+
     __mapper_args__ = {
         "polymorphic_identity": "jeder gegen jeden"
     }

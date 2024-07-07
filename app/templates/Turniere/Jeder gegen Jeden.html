@@ -1,0 +1,50 @@
+{% macro renderFFA(cup) %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>
+                    Name
+                </th>
+                {% for teilnehmer in cup.teilnehmer %}
+                    {% with person=teilnehmer.person %}
+                        <th scope="col" style="writing-mode: vertical-lr;text-orientation: mixed;">
+                            {{ person.name }}, {{ person.surname }}
+                        </th>
+                    {% endwith %}
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for teilnehmer in cup.teilnehmer %}
+                <tr>
+                    {% with person=teilnehmer.person %}
+                        <th scope="row">
+                            {{ person.name }}, {{ person.surname }}
+                        </th>
+                    {% endwith %}
+                    {% for opponent in cup.teilnehmer %}
+                        {% with result=teilnehmer.get_result_against(opponent) %}
+                            {% if opponent == teilnehmer %}
+                                <td style="background-color: #00A">X</td>
+                            {% elif result == None %}
+                            	<td></td>
+                            {% elif result == -2 %}
+                                <td style="background-color: #F00">-</td>
+                            {% elif result == -1 %}
+                                <td style="background-color: #A00">0</td>
+                            {% elif result == 0 %}
+                                <td style="background-color: #AA0">½</td>
+                            {% elif result == 1 %}
+                                <td style="background-color: #0A0">1</td>
+                            {% elif result == 2 %}
+                                <td style="background-color: #0F0">2</td>
+                            {% else %}
+                                <td>{{ result }}</td>
+                            {% endif %}
+                        {% endwith %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}

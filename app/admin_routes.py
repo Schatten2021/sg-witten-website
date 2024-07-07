@@ -188,7 +188,8 @@ def edit_turnier(id: int):
             return request.form, 400
         contestant = Teilnehmer(person=person,
                                 turnier=cup,
-                                verein=team)
+                                verein=team,
+                                turnier_type=cup.runden_art)
         teilnehmer.append(contestant)
     cup.teilnehmer = teilnehmer
     match request.form.get("turnier_type"):
@@ -215,8 +216,10 @@ def edit_turnier(id: int):
             return request.form, 400
         game: Game = Game(player1=player1, player2=player2, result=int(result))
         db.session.add(game)
+    cup.name = request.form.get("name")
     flash("saved successfully", "success")
     db.session.commit()
+    db.session.add(cup)
     return request.form
 
 
