@@ -203,7 +203,7 @@ def edit_turnier(id: int):
             cup.__class__ = Turnier
     games = {(key[len("game "):key.index("-")], key[key.index("-") + 1:]): value
              for key, value in request.form.items()
-             if re.fullmatch(r"game [0-9]*-[0-9]", key)
+             if re.fullmatch(r"game [0-9]*-[0-9]*", key)
              }
     for (player1_index, player2_index), result in games.items():
         if result == "":

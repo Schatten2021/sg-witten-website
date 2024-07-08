@@ -7,18 +7,23 @@
         }
         .won-KL {
             background-color: #0F0 !important;
+            border: none;
         }
         .won {
             background-color: #0A0 !important;
+            border: none;
         }
         .remi {
             background-color: #AA0 !important;
+            border: none;
         }
         .lost {
             background-color: #A00 !important;
+            border: none;
         }
         .lost-KL {
             background-color: #F00 !important;
+            border: none;
         }
     </style>
 {% endblock %}
@@ -34,13 +39,13 @@
             <label>
                 Turnierart:
                 <select name="turnier_type" id="turnier-art-select">
-                    <option value="K.O." selected>K.O. Turnier</option>
+                    <option value="K.O.">K.O. Turnier</option>
                     <option value="Schweizer">Schweizer System</option>
                     <option value="jeder gegen jeden">Jeder gegen jeden</option>
                 </select>
             </label>
         </div>
-        <div id="">
+        <div>
             <table class="table table-bordered">
                 <thead>
                     <tr>
@@ -154,7 +159,6 @@
                 newPerson.appendChild(document.createElement("td"));
             }
             personenDiv.insertBefore(newPerson, addRow)
-            //TODO: add Verein selection
             //TODO: depending on the current cup type change the generated html
             updatePeople()
         }
@@ -163,16 +167,20 @@
                 renderFFA()
             //TODO: implement checking and appropriate change of name update method
         }
-        function renderFFA() {
-            const table = document.createElement("table");
-            table.className = "table table-bordered";
-            console.debug("rendering FFA")
+        function getSelectedPeople() {
             let selectedPeople = []
             for (let i = 0; i < personenDiv.children.length - 1; i++) {
                 const elem = personenDiv.children[i].children[0].children[0]
                 const selectedOption = elem.options[elem.selectedIndex].text
                 selectedPeople.push(selectedOption)
             }
+            return selectedPeople
+        }
+        function renderFFA() {
+            const table = document.createElement("table");
+            table.className = "table table-bordered";
+            console.debug("initializing render of FFA")
+            let selectedPeople = getSelectedPeople()
             // generate top row
             const topRow = document.createElement("tr")
             topRow.innerHTML += "<th>Namen</th>"
@@ -201,39 +209,19 @@
                     } else {
                         const dropdown = resultDropdownBP.cloneNode(true);
                         dropdown.id = "";
-                        const idkWhatToNameThis = {
-                            "": {
-                                "opposite": "",
-                                "class": ""
-                            },
-                            "-2": {
-                                "opposite": "2",
-                                "class": "lost-KL"
-                            },
-                            "-1": {
-                                "opposite": "1",
-                                "class": "lost"
-                            },
-                            "0": {
-                                "opposite": "0",
-                                "class": "remi"
-                            },
-                            "1": {
-                                "opposite": "-1",
-                                "class": "won"
-                            },
-                            "2": {
-                                "opposite": "-2",
-                                "class": "won-KL"
-                            }
-                        }
+                        dropdown.value = FFAData.games[i][j];
+                        dropdown.className = resultsDataTable[dropdown.value].class
+                        dropdown.style.width = "100%"
                         dropdown.addEventListener("change", () => {
-                            const opposite = idkWhatToNameThis[dropdown.value]
-                            dropdown.className = opposite.class
-                            table.children[j+1].children[i+1].children[0].value = opposite.opposite;
-                            table.children[j+1].children[i+1].children[0].className = idkWhatToNameThis[opposite.opposite].class
+                            const formattingData = resultsDataTable[dropdown.value]
+                            dropdown.className = formattingData.class
+                            currentElement.className = formattingData.class
+                            table.children[j+1].children[i+1].children[0].value = formattingData.opposite;
+                            table.children[j+1].children[i+1].children[0].className = resultsDataTable[formattingData.opposite].class;
+                            FFAData.games[i][j] = dropdown.value;
+                            FFAData.games[j][i] = formattingData.opposite;
                         })
-                        dropdown.name = `game ${i}-${j}`
+                        dropdown.name = i < j ? `game ${i}-${j}` : "";
                         currentElement.appendChild(dropdown)
                     }
                     currentRow.appendChild(currentElement)
@@ -247,7 +235,6 @@
             games.innerHTML = "";
             games.appendChild(table)
 
-            //TODO: change personen input
             addPersonInfoColumns("Punkte", "Rang")
         }
         function addPersonInfoColumns(...columnNames) {
@@ -279,5 +266,100 @@
                 }
             }
         }
+
+        function setup(mode) {
+            switch (mode) {
+                case "FFA":
+                    setupFFA()
+                    break
+            }
+        }
+        function setupFFA() {
+            createAllPerson(FFAData.player);
+            renderFFA();
+        }
+        function createAllPerson(people) {
+            for (let i = 0; i < people.length; i++) {
+                const addRow = personenDiv.children[personenDiv.children.length - 1];
+                const newPerson = document.createElement("tr")
+                const personDropdown = personDropdownBP.cloneNode(true)
+                const teamDropdown = teamDropdownBP.cloneNode(true)
+
+                personDropdown.name = "teilnehmer" + (personenDiv.children.length - 1);
+                personDropdown.id = "";
+                personDropdown.value = people[i].id;
+                personDropdown.addEventListener("change", updatePeople)
+
+                teamDropdown.name = `teilnehmer${personenDiv.children.length - 1}-team`;
+                teamDropdown.id = "";
+                teamDropdown.value = people[i].verein
+
+                newPerson.appendChild(document.createElement("td")).appendChild(personDropdown)
+                newPerson.appendChild(document.createElement("td")).appendChild(teamDropdown)
+                const personTableHeader = personenDiv.parentElement.children[0].children[0]
+                for (let i = 2; i < personTableHeader.children.length; i++) {
+                    newPerson.appendChild(document.createElement("td"));
+                }
+                personenDiv.insertBefore(newPerson, addRow)
+            }
+        }
+    </script>
+    <script>
+        const resultsDataTable = {
+            "": {
+                "opposite": "",
+                "class": ""
+            },
+            "-2": {
+                "opposite": "2",
+                "class": "lost-KL"
+            },
+            "-1": {
+                "opposite": "1",
+                "class": "lost"
+            },
+            "0": {
+                "opposite": "0",
+                "class": "remi"
+            },
+            "1": {
+                "opposite": "-1",
+                "class": "won"
+            },
+            "2": {
+                "opposite": "-2",
+                "class": "won-KL"
+            }
+        }
+        let FFAData = {
+            {% if isinstance(cup, FFATurnier) %}
+                "player": [
+                    {% for player in cup.teilnehmer %}
+                        {
+                            "id": {{ player.id }},
+                            "verein": {{ player.verein.id }}
+                        },
+                    {% endfor %}
+                ],
+                "games": [
+                    {% for player in cup.teilnehmer %}
+                        {% set outer_loop=loop %}
+                        [
+                            {% for opponent in cup.teilnehmer %}
+                                {% set result=player.get_result_against(opponent) %}
+                                "{{ result if result != None else '' }}",
+                            {% endfor %}
+                        ],
+                    {% endfor %}
+                ],
+            {% else %}
+                "player": [],
+                "games": [],
+            {% endif %}
+        }
+
+        {% if isinstance(cup, FFATurnier) %}
+            setupFFA();
+        {% endif %}
     </script>
 {% endblock %}

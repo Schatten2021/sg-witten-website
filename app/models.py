@@ -1,13 +1,12 @@
-import logging
+import re
 from datetime import datetime
 from typing import Optional
 
-from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import or_, Column, Integer, ForeignKey, Boolean, DateTime, String, and_
 from sqlalchemy.orm import Mapped, relationship
-from sqlalchemy import or_, Column, Integer, ForeignKey, Boolean, DateTime, Float, String
-from sqlalchemy.ext.associationproxy import association_proxy
+from werkzeug.security import generate_password_hash, check_password_hash
+
 from app import db
-import re
 
 
 class Person(db.Model):
@@ -184,8 +183,9 @@ class Teilnehmer(db.Model):
 
 class FFATeilnehmer(Teilnehmer):
     def get_result_against(self, other: "FFATeilnehmer") -> int | None:
-        game = Game.query.filter_by(player1=self, player2=other).first()
-        return game.result if game is not None else None
+        game = Game.query.filter(or_(and_(Game.player1 == self, Game.player2 == other),
+                                     and_(Game.player2 == self, Game.player1== other))).first()
+        return None if game is None else game.result if game.player1 == self else -game.result
 
     __mapper_args__ = {
         "polymorphic_identity": "jeder gegen jeden"
