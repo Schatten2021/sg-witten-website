@@ -49,8 +49,10 @@
             <table class="table table-bordered">
                 <thead>
                     <tr>
+                        <th scope="col">Rang</th>
                         <th scope="col">Person</th>
                         <th scope="col">Verein</th>
+                        <th scope="col">Punkte</th>
                     </tr>
                 </thead>
                 <tbody id="personen-table-body">
@@ -144,6 +146,7 @@
             const newPerson = document.createElement("tr")
             const personDropdown = personDropdownBP.cloneNode(true)
             const teamDropdown = teamDropdownBP.cloneNode(true)
+            newPerson.appendChild(document.createElement("td")).innerText = (personenDiv.children.length - 1).toString()
 
             personDropdown.name = "teilnehmer" + (personenDiv.children.length - 1);
             personDropdown.id = "";
@@ -155,7 +158,7 @@
             newPerson.appendChild(document.createElement("td")).appendChild(personDropdown)
             newPerson.appendChild(document.createElement("td")).appendChild(teamDropdown)
             const personTableHeader = personenDiv.parentElement.children[0].children[0]
-            for (let i = 2; i < personTableHeader.children.length; i++) {
+            for (let i = 4; i < personTableHeader.children.length; i++) {
                 newPerson.appendChild(document.createElement("td"));
             }
             personenDiv.insertBefore(newPerson, addRow)
@@ -170,16 +173,20 @@
         function getSelectedPeople() {
             let selectedPeople = []
             for (let i = 0; i < personenDiv.children.length - 1; i++) {
-                const elem = personenDiv.children[i].children[0].children[0]
+                const elem = personenDiv.children[i].children[1].children[0]
                 const selectedOption = elem.options[elem.selectedIndex].text
                 selectedPeople.push(selectedOption)
             }
             return selectedPeople
         }
         function renderFFA() {
+            let playerIndices = FFAData.player.map((item, index) => index);
+            playerIndices = playerIndices.sort((i, j) => FFAData.player[j].points - FFAData.player[i].points)
+            FFAData.games = playerIndices.map((i) => FFAData.games[i])
+            FFAData.player = playerIndices.map((i) => FFAData.player[i])
+            {#FFAData.player = FFAData.player.sort((player1, player2) => player2.points - player1.points)#}
             const table = document.createElement("table");
             table.className = "table table-bordered";
-            console.debug("initializing render of FFA")
             let selectedPeople = getSelectedPeople()
             // generate top row
             const topRow = document.createElement("tr")
@@ -220,6 +227,9 @@
                             table.children[j+1].children[i+1].children[0].className = resultsDataTable[formattingData.opposite].class;
                             FFAData.games[i][j] = dropdown.value;
                             FFAData.games[j][i] = formattingData.opposite;
+                            FFAData.player[i].points = FFAData.games[i].reduce((sum, game) => sum + resultsDataTable[game].points, 0)
+                            FFAData.player[j].points = FFAData.games[j].reduce((sum, game) => sum + resultsDataTable[game].points, 0)
+                            reloadPersonTable()
                         })
                         dropdown.name = i < j ? `game ${i}-${j}` : "";
                         currentElement.appendChild(dropdown)
@@ -234,8 +244,6 @@
             }
             games.innerHTML = "";
             games.appendChild(table)
-
-            addPersonInfoColumns("Punkte", "Rang")
         }
         function addPersonInfoColumns(...columnNames) {
             //headers
@@ -266,7 +274,16 @@
                 }
             }
         }
-
+        function reloadPersonTable() {
+            personenDiv.innerHTML = "";
+            if (cup_type_input.value === "jeder gegen jeden") {
+                let playerIndices = FFAData.player.map((item, index) => index);
+                playerIndices = playerIndices.sort((i, j) => FFAData.player[j].points - FFAData.player[i].points)
+                FFAData.games = playerIndices.map((i) => FFAData.games[i])
+                FFAData.player = playerIndices.map((i) => FFAData.player[i])
+                createAllPerson(FFAData.player)
+            }
+        }
         function setup(mode) {
             switch (mode) {
                 case "FFA":
@@ -275,29 +292,33 @@
             }
         }
         function setupFFA() {
+            cup_type_input.value = "jeder gegen jeden"
             createAllPerson(FFAData.player);
             renderFFA();
         }
         function createAllPerson(people) {
             for (let i = 0; i < people.length; i++) {
+                const person = people[i];
                 const addRow = personenDiv.children[personenDiv.children.length - 1];
                 const newPerson = document.createElement("tr")
                 const personDropdown = personDropdownBP.cloneNode(true)
                 const teamDropdown = teamDropdownBP.cloneNode(true)
+                newPerson.appendChild(document.createElement("td")).innerText = i + 1
 
-                personDropdown.name = "teilnehmer" + (personenDiv.children.length - 1);
+                personDropdown.name = "teilnehmer" + (i);
                 personDropdown.id = "";
                 personDropdown.value = people[i].id;
                 personDropdown.addEventListener("change", updatePeople)
 
-                teamDropdown.name = `teilnehmer${personenDiv.children.length - 1}-team`;
+                teamDropdown.name = `teilnehmer${i}-team`;
                 teamDropdown.id = "";
-                teamDropdown.value = people[i].verein
+                teamDropdown.value = person.verein
 
                 newPerson.appendChild(document.createElement("td")).appendChild(personDropdown)
                 newPerson.appendChild(document.createElement("td")).appendChild(teamDropdown)
+                newPerson.appendChild(document.createElement("td")).innerText = person.points
                 const personTableHeader = personenDiv.parentElement.children[0].children[0]
-                for (let i = 2; i < personTableHeader.children.length; i++) {
+                for (let j = 4; j < personTableHeader.children.length; j++) {
                     newPerson.appendChild(document.createElement("td"));
                 }
                 personenDiv.insertBefore(newPerson, addRow)
@@ -308,27 +329,33 @@
         const resultsDataTable = {
             "": {
                 "opposite": "",
-                "class": ""
+                "class": "",
+                "points": 0,
             },
             "-2": {
                 "opposite": "2",
-                "class": "lost-KL"
+                "class": "lost-KL",
+                "points": 0,
             },
             "-1": {
                 "opposite": "1",
-                "class": "lost"
+                "class": "lost",
+                "points": 0,
             },
             "0": {
                 "opposite": "0",
-                "class": "remi"
+                "class": "remi",
+                "points": .5,
             },
             "1": {
                 "opposite": "-1",
-                "class": "won"
+                "class": "won",
+                "points": 1,
             },
             "2": {
                 "opposite": "-2",
-                "class": "won-KL"
+                "class": "won-KL",
+                "points": 1,
             }
         }
         let FFAData = {
@@ -337,7 +364,8 @@
                     {% for player in cup.teilnehmer %}
                         {
                             "id": {{ player.id }},
-                            "verein": {{ player.verein.id }}
+                            "verein": {{ player.verein.id }},
+                            "points": {{ player.points }}
                         },
                     {% endfor %}
                 ],

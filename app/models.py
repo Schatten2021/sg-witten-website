@@ -172,8 +172,12 @@ class Teilnehmer(db.Model):
     verein: Mapped["Verein"] = relationship("Verein")
 
     @property
-    def games(self):
-        return Game.query.filter_by(or_(Game.player1 == self, Game.player2 == self)).all()
+    def games(self) -> list["Game"]:
+        return Game.query.filter(or_(Game.player1 == self, Game.player2 == self)).all()
+
+    @property
+    def points(self) -> float:
+        return sum(game.getPoints(self) for game in self.games)
 
     __mapper_args__ = {
         "polymorphic_identity": "Teilnehmer",
@@ -225,3 +229,14 @@ class Game(db.Model):
     player1: Mapped[Teilnehmer] = relationship("Teilnehmer", foreign_keys=[player1_id])
     player2_id: Mapped[int] = Column(ForeignKey("teilnehmer.id"))
     player2: Mapped[Teilnehmer] = relationship("Teilnehmer", foreign_keys=[player2_id])
+
+    def getPoints(self, player: Teilnehmer) -> float:
+        if self.result == 0:
+            return .5
+        if player == self.player1:
+            if self.result > 0:
+                return 1
+            return 0
+        if self.result > 0:
+            return 0
+        return 1
