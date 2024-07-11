@@ -42,7 +42,7 @@ def not_found(*_):
 
 @app.before_request
 def before_request():
-    if request.endpoint != "static" and "Location" not in request.headers and request.method != "GET":
+    if request.endpoint != "static" and "Location" not in request.headers and request.method == "GET":
         flash(
             f"Dies ist ein persönliches Remake der SG-Witten Website (<a href=\"https://schachgesellschaft-witten.de/\">Original</a>). "
             f"Alle Daten auf dieser Seite sind dem Original entnommen. "
