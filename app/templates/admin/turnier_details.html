@@ -25,46 +25,17 @@
             background-color: #F00 !important;
             border: none;
         }
+        .ffa-game {
+            width: 100%;
+            height: 100%
+        }
+        .ffa-game-self {
+            background-color: #00A !important;
+        }
     </style>
 {% endblock %}
 {% block body %}
-    <form id="form" method="post" action="/admin/turniere/{{ cup.id }}">
-        <div id="general">
-            <h1>
-                <label>
-                        <input type="text" value="{{ cup.name }}" name="name" required>
-                </label>
-            </h1>
-            {# TODO: date input #}
-            <label>
-                Turnierart:
-                <select name="turnier_type" id="turnier-art-select">
-                    <option value="K.O.">K.O. Turnier</option>
-                    <option value="Schweizer">Schweizer System</option>
-                    <option value="jeder gegen jeden">Jeder gegen jeden</option>
-                </select>
-            </label>
-        </div>
-        <div>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th scope="col">Rang</th>
-                        <th scope="col">Person</th>
-                        <th scope="col">Verein</th>
-                        <th scope="col">Punkte</th>
-                    </tr>
-                </thead>
-                <tbody id="personen-table-body">
-                    <tr>
-                        <td><button class="btn" onclick="addPerson()" type="button">
-                            <i class="fa-solid fa-user-plus fa-xl"></i>
-                        </button></td>
-                        <td></td>
-                    </tr>
-                </tbody>
-            </table>
-            <div id="bp" style="display: none">
+    <div id="bp" style="display: none">
                 <label>
                 <select id="all_people">
                     {% for person in Person.query.all() %}
@@ -85,7 +56,56 @@
                     {% endfor %}
                 </select>
             </label>
-            </div>
+    </div>
+    <form id="form" method="post" action="/admin/turniere/{{ cup.id }}">
+        <div id="general">
+            <h1>
+                <label>
+                        <input type="text" value="{{ cup.name }}" name="name" required>
+                </label>
+            </h1>
+            <label>
+                DWZ Anzeigen:
+                <input type="checkbox" value="{{ cup.display_dwz }}" id="show-DWZ-Input">
+            </label>
+            <label>
+                Altersgruppen anzeigen:
+                <input type="checkbox" value="{{ cup.display_age_group }}" id="show-age-Input">
+            </label>
+            {# TODO: date input #}
+            <label>
+                Turnierart:
+                <select name="turnier_type" id="turnier-art-select">
+                    <option value="K.O."{% if isinstance(cup, KOTurnier) %} selected{% endif %}>K.O. Turnier</option>
+                    <option value="Schweizer"{% if isinstance(cup, SchweizerTurnier) %} selected{% endif %}>Schweizer System</option>
+                    <option value="jeder gegen jeden"{% if isinstance(cup, FFATurnier) %} selected{% endif %}>Jeder gegen jeden</option>
+                </select>
+            </label>
+        </div>
+        <div>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Rang</th>
+                        <th scope="col">Person</th>
+                        <th scope="col">Verein</th>
+                        <th scope="col">Punkte</th>
+                        {% if cup.display_dwz %}
+                            <th scope="col">DWZ</th>
+                        {% endif %}
+                        {% if cup.display_age_group %}
+                            <th scope="col">Altersklasse</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody id="personen-table-body">
+                    <tr>
+                        <td rowspan="{% if cup.display_dwz and cup.display_age_group %}6{% elif cup.display_dwz or cup.display_age_group %}5{% else %}4{% endif %}"><button class="btn" onclick="addPerson()" type="button">
+                            <i class="fa-solid fa-user-plus fa-xl"></i>
+                        </button></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         <!--<table id="legende" class="table table-bordered">
             <thead>
@@ -124,7 +144,7 @@
     </form>
 {% endblock %}
 {% block javascript %}
-	<script>
+	{# <script>
         const form = document.getElementById("form")
         const personenDiv = document.getElementById("personen-table-body")
         const games = document.getElementById("games")
@@ -184,7 +204,7 @@
             playerIndices = playerIndices.sort((i, j) => FFAData.player[j].points - FFAData.player[i].points)
             FFAData.games = playerIndices.map((i) => FFAData.games[i])
             FFAData.player = playerIndices.map((i) => FFAData.player[i])
-            {#FFAData.player = FFAData.player.sort((player1, player2) => player2.points - player1.points)#}
+            //FFAData.player = FFAData.player.sort((player1, player2) => player2.points - player1.points)
             const table = document.createElement("table");
             table.className = "table table-bordered";
             let selectedPeople = getSelectedPeople()
@@ -324,8 +344,30 @@
                 personenDiv.insertBefore(newPerson, addRow)
             }
         }
-    </script>
+    </script> #}
     <script>
+        let Data = {
+            "players": [{% for player in cup.teilnehmer %}
+                {
+                    "id": {{ player.person.id }},
+                    "verein": {{ player.verein.id }},
+                    "points": {{ player.points }},
+                },{% endfor %}
+            ],
+            "games": {
+                "FFA": [{% if isinstance(cup, FFATurnier) %}{% for player in cup.teilnehmer %}
+                	[{% for opponent in cup.teilnehmer %}{% with result=player.get_result_against(opponent) %}
+                        "{{ result if result != None else "" }}",
+                	{% endwith %}{% endfor %}],
+                {% endfor %}{% endif %}]
+            },
+            "people": [{% for person in Person.query.all() %}
+                {
+                    "id": {{ person.id }},
+                    "name": "{{ person.name }}, {{ person.surname }}",
+                },
+            {% endfor %}]
+        }
         const resultsDataTable = {
             "": {
                 "opposite": "",
@@ -358,36 +400,7 @@
                 "points": 1,
             }
         }
-        let FFAData = {
-            {% if isinstance(cup, FFATurnier) %}
-                "player": [
-                    {% for player in cup.teilnehmer %}
-                        {
-                            "id": {{ player.id }},
-                            "verein": {{ player.verein.id }},
-                            "points": {{ player.points }}
-                        },
-                    {% endfor %}
-                ],
-                "games": [
-                    {% for player in cup.teilnehmer %}
-                        {% set outer_loop=loop %}
-                        [
-                            {% for opponent in cup.teilnehmer %}
-                                {% set result=player.get_result_against(opponent) %}
-                                "{{ result if result != None else '' }}",
-                            {% endfor %}
-                        ],
-                    {% endfor %}
-                ],
-            {% else %}
-                "player": [],
-                "games": [],
-            {% endif %}
-        }
-
-        {% if isinstance(cup, FFATurnier) %}
-            setupFFA();
-        {% endif %}
     </script>
+    <script src="/static/js/admin/Turnier/FFA.js"></script>
+    <script src="/static/js/admin/Turnier/common.js"></script>
 {% endblock %}

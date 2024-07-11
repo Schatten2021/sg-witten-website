@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import or_, Column, Integer, ForeignKey, Boolean, DateTime, String, and_
+from sqlalchemy import or_, and_, Column, Integer, ForeignKey, Boolean, DateTime, String, Float
 from sqlalchemy.orm import Mapped, relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -130,6 +130,8 @@ class Turnier(db.Model):
     teilnehmer: Mapped[list["Teilnehmer"]] = relationship("Teilnehmer")
     # jeder gegen jeden; Schweizer; K.O.
     runden_art: Mapped[str] = Column(String)
+    display_dwz: Mapped[bool] = Column(Boolean, default=False)
+    display_age_group: Mapped[bool] = Column(Boolean, default=False)
 
     @property
     def termine(self) -> list["Termin"]:
@@ -170,6 +172,8 @@ class Teilnehmer(db.Model):
     turnier_type: Mapped[str] = Column(String)
     vereins_id: Mapped[int] = Column(ForeignKey("verein.id"))
     verein: Mapped["Verein"] = relationship("Verein")
+    dwz: Mapped[float] = Column(Float, nullable=True)
+    age_group: Mapped[int] = Column(Integer, nullable=True)
 
     @property
     def games(self) -> list["Game"]:
@@ -188,8 +192,13 @@ class Teilnehmer(db.Model):
 class FFATeilnehmer(Teilnehmer):
     def get_result_against(self, other: "FFATeilnehmer") -> int | None:
         game = Game.query.filter(or_(and_(Game.player1 == self, Game.player2 == other),
-                                     and_(Game.player2 == self, Game.player1== other))).first()
-        return None if game is None else game.result if game.player1 == self else -game.result
+                                     and_(Game.player2 == self, Game.player1 == other))).first()
+        if game is None:
+            return None
+        if game.player1 == self:
+            return game.result
+        else:
+            return -game.result
 
     __mapper_args__ = {
         "polymorphic_identity": "jeder gegen jeden"
