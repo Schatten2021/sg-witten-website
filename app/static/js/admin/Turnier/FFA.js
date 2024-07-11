@@ -48,12 +48,50 @@ const FFA = {
         //TODO: implement
     },
     "addPerson": function (index, row) {
+        const id = row.children[1].children[0].value;
         Data.players.push({
             "verein": row.children[2].children[0].value,
-            "id": row.children[1].children[0].value,
+            "id": id,
             "points": 0,
         })
-        //TODO: update table
+
+        //update table
+        const table = gamesDiv.children[0]
+        const tableHead = table.children[0].children[0];
+        const tableHeaderElem = tableHead.appendChild(document.createElement("th"));
+        tableHeaderElem.innerText = getPlayerName(id)
+        tableHeaderElem.className = "ffa-name-header"
+        const tableBody = table.children[1];
+        for (let i = 0; i < tableBody.children.length; i++) {
+            const currentRow = tableBody.children[i];
+            const dropdown = currentRow.appendChild(document.createElement("td")).appendChild(Blueprints.resultsDropdown.cloneNode(true));
+            dropdown.id = null;
+            dropdown.className = "ffa-game";
+            dropdown.addEventListener("change", () => {
+                FFA.gameResultChange(i, index);
+            })
+            Data.games.FFA[i].push("")
+        }
+        const gameRow = tableBody.appendChild(document.createElement("tr"));
+        Data.games.FFA.push([]);
+        const rowHeader = gameRow.appendChild(document.createElement("th"))
+        rowHeader.innerText = getPlayerName(id);
+        rowHeader.scope = "row";
+        for (let i = 0; i < Data.players.length; i++) {
+            if (i === index) {
+                const elem = gameRow.appendChild(document.createElement("td"));
+                elem.innerText = "X";
+                elem.className = "ffa-game-self"
+                continue;
+            }
+            const dropdown = gameRow.appendChild(document.createElement("td")).appendChild(Blueprints.resultsDropdown.cloneNode(true));
+            dropdown.id = null;
+            dropdown.className = "ffa-game";
+            dropdown.addEventListener("change", () => {
+                FFA.gameResultChange(index, i);
+            })
+            Data.games.FFA[index].push("")
+        }
     },
     "changePerson": function (index, row) {
         Data.players[index].id = row.children[1].value;

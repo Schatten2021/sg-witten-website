@@ -69,6 +69,7 @@ function getSelectedPeople() {
     return selectedPeople;
 }
 function getPlayerName(id) {
+    id = parseInt(id)
     return Data.people.find((person) => person.id === id).name;
 }
 
