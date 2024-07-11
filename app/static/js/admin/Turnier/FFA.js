@@ -94,7 +94,12 @@ const FFA = {
         }
     },
     "changePerson": function (index, row) {
-        Data.players[index].id = row.children[1].value;
-        //TODO update table
+        const id = row.children[1].children[0].value
+        console.debug(id)
+        const name = getPlayerName(id)
+        Data.players[index].id = id;
+        const table = gamesDiv.children[0]
+        table.children[0].children[0].children[index+1].innerText = name
+        table.children[1].children[index].children[0].innerText = name
     },
 }
