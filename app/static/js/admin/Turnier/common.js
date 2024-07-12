@@ -79,7 +79,6 @@ function renderAllPeople() {
     }
     for (let i = 0; i < Data.players.length; i++) {
         const player = Data.players[i];
-        console.debug("adding player", player)
         addPerson((index, row) => {})
         const row = contestantsTableBody.children[i];
         row.children[1].children[0].value = player.id;

@@ -1,7 +1,8 @@
 const FFA = {
     "render": function () {
-        console.info("rendering FFA tournament")
-        sortPlayers()
+        console.info("rendering FFA tournament");
+        sortPlayers();
+        gamesDiv.innerHTML = "";
         const table = gamesDiv.appendChild(document.createElement("table"));
         table.className = "table table-bordered"
         FFA.renderTableHeader(table.appendChild(document.createElement("thead")).appendChild(document.createElement("tr")));
@@ -45,7 +46,23 @@ const FFA = {
         }
     },
     "gameResultChange": function(row, col) {
-        //TODO: implement
+        //                                 .<table>    .<tbody>
+        const tableBody = gamesDiv.children[0].children[1];
+        //                       .<tr>         .<td>         .<select>
+        const element = tableBody.children[row].children[col+1].children[0];
+        const counterElement = tableBody.children[col].children[row+1].children[0];
+        FFA.setResult(element, element.value, row, col);
+        FFA.setResult(counterElement, resultsDataTable[element.value].opposite, col, row);
+        sortPlayers();
+        renderAllPeople();
+        FFA.render() //TODO: add reload button
+    },
+    "setResult": function(select, result, row, col) {
+        const resultData = resultsDataTable[result];
+        select.value = result;
+        select.className = `ffa-game ${resultData.class}`;
+        Data.games.FFA[row][col] = result;
+        FFA.reloadPlayerScore(row);
     },
     "addPerson": function (index, row) {
         const id = row.children[1].children[0].value;
@@ -101,5 +118,8 @@ const FFA = {
         const table = gamesDiv.children[0]
         table.children[0].children[0].children[index+1].innerText = name
         table.children[1].children[index].children[0].innerText = name
+    },
+    "reloadPlayerScore": function (index) {
+        Data.players[index].points = Data.games.FFA[index].reduce((currentSum, val) => currentSum + resultsDataTable[val].points)
     },
 }
