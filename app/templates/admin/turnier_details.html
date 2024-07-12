@@ -150,6 +150,7 @@
                     "id": {{ player.person.id }},
                     "verein": {{ player.verein.id }},
                     "points": {{ player.points }},
+                    "freispiel": {{ "true" if player.freispiel else "false" }}
                 },{% endfor %}
             ],
             "games": {

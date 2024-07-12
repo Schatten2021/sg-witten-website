@@ -1,7 +1,11 @@
 const FFA = {
     "render": function () {
         console.info("rendering FFA tournament");
+        for (let i = 0; i < Data.players.length; i++) {
+            FFA.reloadPlayerScore(i)
+        }
         sortPlayers();
+        renderAllPeople()
         gamesDiv.innerHTML = "";
         const table = gamesDiv.appendChild(document.createElement("table"));
         table.className = "table table-bordered"
@@ -43,6 +47,12 @@ const FFA = {
                     FFA.gameResultChange(i, j)
                 })
             }
+            const freispiel = row.appendChild(document.createElement("td")).appendChild(document.createElement("input"));
+            freispiel.type = "checkbox";
+            freispiel.checked = player.freispiel;
+            freispiel.addEventListener("change",() => {
+                FFA.setFreispiel(i, freispiel);
+            })
         }
     },
     "gameResultChange": function(row, col) {
@@ -63,6 +73,13 @@ const FFA = {
         select.className = `ffa-game ${resultData.class}`;
         Data.games.FFA[row][col] = result;
         FFA.reloadPlayerScore(row);
+    },
+    "setFreispiel": function (index, checkbox) {
+        Data.players[index].freispiel = checkbox.checked;
+        FFA.reloadPlayerScore(index);
+        sortPlayers();
+        renderAllPeople();
+        FFA.render();
     },
     "addPerson": function (index, row) {
         const id = row.children[1].children[0].value;
@@ -120,6 +137,13 @@ const FFA = {
         table.children[1].children[index].children[0].innerText = name
     },
     "reloadPlayerScore": function (index) {
-        Data.players[index].points = Data.games.FFA[index].reduce((currentSum, val) => currentSum + resultsDataTable[val].points)
+        Data.players[index].points = Data.games.FFA[index]
+            .reduce((currentSum, val) => {
+                // console.debug(currentSum, resultsDataTable[val].points)
+                return currentSum + resultsDataTable[val].points
+            }, 0)
+        if (Data.players[index].freispiel) {
+            Data.players[index].points++;
+        }
     },
 }

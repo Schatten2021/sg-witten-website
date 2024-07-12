@@ -172,6 +172,7 @@ class Teilnehmer(db.Model):
     turnier_type: Mapped[str] = Column(String)
     vereins_id: Mapped[int] = Column(ForeignKey("verein.id"))
     verein: Mapped["Verein"] = relationship("Verein")
+    freispiel: Mapped[bool] = Column(Boolean, default=False)
     dwz: Mapped[float] = Column(Float, nullable=True)
     age_group: Mapped[int] = Column(Integer, nullable=True)
 
@@ -181,7 +182,7 @@ class Teilnehmer(db.Model):
 
     @property
     def points(self) -> float:
-        return sum(game.getPoints(self) for game in self.games)
+        return sum(game.getPoints(self) for game in self.games) + (1 if self.freispiel else 0)
 
     __mapper_args__ = {
         "polymorphic_identity": "Teilnehmer",

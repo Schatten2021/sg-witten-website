@@ -96,8 +96,56 @@ function sortPlayers() {
     Data.games.FFA = newFFAGames;
 }
 
-function submit() {
-    //TODO: gather data and submit it.
+async function submit(e) {
+    e.preventDefault();
+    const name = form.elements["name"].value;
+    const type = cupTypeInput.value;
+    let games = []
+
+    function getFFAGames() {
+        for (let i = 0; i < Data.players.length; i++) {
+            for (let j = i + 1; j < Data.players.length; j++) {
+                const game = Data.games.FFA[i][j];
+                if (game === "") {
+                    continue
+                }
+                games.push({
+                    "player1": i,
+                    "player2": j,
+                    "result": game,
+                })
+            }
+        }
+    }
+
+    switch (type) {
+        case "jeder gegen jeden":
+            getFFAGames();
+            break;
+        default:
+            throw Error(`Invalid type ${type}`);
+    }
+    const data = {
+        "name": name,
+        "type": type,
+        "players": Data.players.map((player) => {
+            return {
+                "personId": player.id,
+                "vereinsId": player.verein,
+                "freispiel": player.freispiel,
+            }
+        }),
+        "games": games
+    }
+    const response = await fetch(window.location.href, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data),
+    })
+    if (response.ok)
+        console.debug(await response.json())
 }
 
 //setup function

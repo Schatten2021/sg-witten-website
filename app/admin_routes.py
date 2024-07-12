@@ -158,69 +158,44 @@ def edit_turnier(id: int):
     cup: Turnier = Turnier.query.get(id)
     if request.method == "GET":
         return render_template("admin/turnier_details.html", cup=cup)
+    if not request.is_json:
+        return {"error": "invalid request"}
 
     for teilnehmer in cup.teilnehmer:
-        db.session.delete(teilnehmer)
         for game in Game.query.filter_by(player1=teilnehmer).all():
             db.session.delete(game)
+        cup.teilnehmer.remove(teilnehmer)
+        db.session.delete(teilnehmer)
 
-    try:
-        contestants_ids: set[tuple[int, int]] = {(int(key[len("teilnehmer"):]), int(value)) for key, value in request.form.items()
-                                     if re.fullmatch("teilnehmer[0-9]*", key)}
-    except ValueError as e:
-        flash("teilnehmerID ungültig!", "error")
-        print(e)
-        return request.form, 400
+    cup.name = request.json.get("name")
+    cup.runden_art = request.json.get("type")
 
-    teilnehmer: list[Teilnehmer] = list()
-    for i, contestant_id in contestants_ids:
-        person: Person = Person.query.get(contestant_id)
-        team_id: str = request.form.get(f"teilnehmer{i}-team")
-        if team_id is None or any(digit not in "0123456789" for digit in team_id):
-            flash(f"Ungültige team_id \"{team_id}\" (field \"teilnehmer{i}-team\" not found)", "error")
-            return request.form, 400
-        team: Verein = Verein.query.get(int(team_id))
-        if person is None:
-            flash(f"Person {contestant_id} not found")
-            return request.form, 400
-        if team is None:
-            flash(f"Teilnehmer {person.name}, {person.surname} has no team.", "error")
-            return request.form, 400
-        contestant = Teilnehmer(person=person,
-                                turnier=cup,
-                                verein=team,
-                                turnier_type=cup.runden_art)
-        teilnehmer.append(contestant)
-    cup.teilnehmer = teilnehmer
-    match request.form.get("turnier_type"):
-        case "jeder gegen jeden":
-            cup.__class__ = FFATurnier
-        case "Schweizer":
-            cup.__class__ = SchweizerTurnier
-        case "K.O.":
-            cup.__class__ = KOTurnier
-        case _:
-            cup.__class__ = Turnier
-    games = {(key[len("game "):key.index("-")], key[key.index("-") + 1:]): value
-             for key, value in request.form.items()
-             if re.fullmatch(r"game [0-9]*-[0-9]*", key)
-             }
-    for (player1_index, player2_index), result in games.items():
-        if result == "":
-            continue
-        try:
-            player1: Teilnehmer = teilnehmer[int(player1_index)]
-            player2: Teilnehmer = teilnehmer[int(player2_index)]
-        except ValueError:
-            flash(f"Spieler konnten nicht gefunden werden", "error")
-            return request.form, 400
-        game: Game = Game(player1=player1, player2=player2, result=int(result))
+    players = []
+    for player in request.json.get("players", []):
+        player: Teilnehmer = Teilnehmer(person_id=player.get("personId", -1),
+                                        turnier=cup,
+                                        vereins_id=player.get("vereinsId", -1),
+                                        freispiel=player.get("freispiel", False),
+                                        dwz=player.get("dwz", None),
+                                        age_group=player.get("ageGroup", None),
+                                        turnier_type=cup.runden_art,
+                                        )
+        db.session.add(player)
+        players.append(player)
+        cup.teilnehmer.append(player)
+
+    for game in request.json.get("games", []):
+        player1 = players[game["player1"]]
+        player2 = players[game["player2"]]
+        game = Game(
+            result=game.get("result", "0"),
+            player1=player1,
+            player2=player2,
+        )
         db.session.add(game)
-    cup.name = request.form.get("name")
-    flash("saved successfully", "success")
-    db.session.commit()
     db.session.add(cup)
-    return request.form
+    db.session.commit()
+    return request.json
 
 
 @bp.route("/teams")  # für Teams bei Turnieren
