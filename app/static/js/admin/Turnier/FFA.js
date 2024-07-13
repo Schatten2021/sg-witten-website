@@ -22,6 +22,9 @@ const FFA = {
             elem.className = "ffa-name-header";
             tableHead.appendChild(elem);
         }
+        const freispielHeader = tableHead.appendChild(document.createElement("th"));
+        freispielHeader.innerText = "Freispiel";
+        freispielHeader.className = "ffa-name-header"
     },
     "renderTableBody": function (tableBody) {
         for (let i = 0; i < Data.players.length; i++) {
@@ -92,13 +95,13 @@ const FFA = {
         //update table
         const table = gamesDiv.children[0]
         const tableHead = table.children[0].children[0];
-        const tableHeaderElem = tableHead.appendChild(document.createElement("th"));
+        const tableHeaderElem = tableHead.insertBefore(document.createElement("th"), tableHead.children[tableHead.children.length - 1]);
         tableHeaderElem.innerText = getPlayerName(id)
         tableHeaderElem.className = "ffa-name-header"
         const tableBody = table.children[1];
         for (let i = 0; i < tableBody.children.length; i++) {
             const currentRow = tableBody.children[i];
-            const dropdown = currentRow.appendChild(document.createElement("td")).appendChild(Blueprints.resultsDropdown.cloneNode(true));
+            const dropdown = currentRow.insertBefore(document.createElement("td"), currentRow.children[currentRow.children.length - 1]).appendChild(Blueprints.resultsDropdown.cloneNode(true));
             dropdown.id = null;
             dropdown.className = "ffa-game";
             dropdown.addEventListener("change", () => {
@@ -107,8 +110,8 @@ const FFA = {
             Data.games.FFA[i].push("")
         }
         const gameRow = tableBody.appendChild(document.createElement("tr"));
-        Data.games.FFA.push([]);
         const rowHeader = gameRow.appendChild(document.createElement("th"))
+        Data.games.FFA.push([])
         rowHeader.innerText = getPlayerName(id);
         rowHeader.scope = "row";
         for (let i = 0; i < Data.players.length; i++) {
@@ -126,6 +129,13 @@ const FFA = {
             })
             Data.games.FFA[index].push("")
         }
+        const freispiel = gameRow.appendChild(document.createElement("td")).appendChild(document.createElement("input"));
+        freispiel.type = "checkbox";
+        freispiel.checked = false;
+        freispiel.addEventListener("change",() => {
+            FFA.setFreispiel(index, freispiel);
+        })
+        Data.games.FFA[index].push("")
     },
     "changePerson": function (index, row) {
         const id = row.children[1].children[0].value

@@ -162,10 +162,10 @@ def edit_turnier(id: int):
         return {"error": "invalid request"}
 
     for teilnehmer in cup.teilnehmer:
-        for game in Game.query.filter_by(player1=teilnehmer).all():
-            db.session.delete(game)
-        cup.teilnehmer.remove(teilnehmer)
+        Game.query.filter_by(player1=teilnehmer).delete()
         db.session.delete(teilnehmer)
+    db.session.commit()
+    cup = Turnier.query.get(id)
 
     cup.name = request.json.get("name")
     cup.runden_art = request.json.get("type")
