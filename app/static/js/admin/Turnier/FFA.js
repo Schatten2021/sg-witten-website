@@ -156,4 +156,61 @@ const FFA = {
             Data.players[index].points++;
         }
     },
+    // feinwertungen
+    "reduceGames": function (playerIndex, callback = (value, index) => 0) {
+        return Data.games.FFA[playerIndex].reduce(
+            (previousValue, currentValue, currentIndex) =>
+                previousValue + (currentValue === "" ? 0 : callback(currentValue, currentIndex))
+            ,0)
+    },
+    "calculateSB": function (playerIndex) {
+        return FFA.reduceGames(playerIndex, (value, index) => resultsDataTable[value].points * Data.players[index].points)
+    },
+    "calculateBuchholzZahl": function (playerIndex) {
+        return FFA.reduceGames(playerIndex, (value, index) => Data.players[index].points);
+    },
+    "calculateBuchholzBuchholzZahl": function (playerIndex) {
+        return FFA.reduceGames(playerIndex, (value, index) => FFA.calculateBuchholzZahl(index));
+    },
+    "comparePlayers": function (player1Index, player2Index) {
+        const player1 = Data.players[player1Index];
+        const player2 = Data.players[player2Index];
+        if (player1.points !== player2.points)
+            return player2.points - player1.points;
+        for (let i = 0; i < FeinwertungDropdowns.length; i++) {
+            const func = FFA.getFeinwertungFunction(FeinwertungDropdowns[i].value);
+            const player1Value = func(player1Index);
+            const player2Value = func(player2Index);
+            if (player1Value === player2Value)
+                continue
+            return player2Value - player1Value;
+        }
+        const player1Name = getPlayerName(player1.id);
+        const player2Name = getPlayerName(player2.id);
+        if (player1Name < player2Name)
+            return -1;
+        if (player1Name > player2Name)
+            return 1;
+        return player2.id - player1.id;
+    },
+    "displayFeinwertung": function (colIndex, select) {
+        const func = FFA.getFeinwertungFunction(select.value)
+        for (let i = 0; i < contestantsTableBody.children.length-1; i++) {
+            const row = contestantsTableBody.children[i];
+            const elem = row.children[colIndex];
+            elem.innerText = func(i);
+        }
+    },
+    "getFeinwertungFunction": function (value) {
+        switch (value) {
+            case "SB":
+                return FFA.calculateSB;
+            case "Buchholz":
+                return FFA.calculateBuchholzZahl;
+            case "BuchholzBuchholz":
+                return FFA.calculateBuchholzBuchholzZahl;
+            default:
+                return () => "---";
+        }
+    }
 }

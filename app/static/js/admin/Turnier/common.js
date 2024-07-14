@@ -9,7 +9,9 @@ const Blueprints = {
     "peopleDropdown": document.getElementById("all_people"),
     "teamDropdown": document.getElementById("all_teams"),
     "resultsDropdown": document.getElementById("possible_game_outcomes"),
+    "feinwertungenDropdown": document.getElementById("Feinwertungen"),
 }
+let FeinwertungDropdowns = []
 function addPerson(callback = null) {
     const index = contestantsTableBody.children.length - 1;
     const rowElement = document.createElement("tr");
@@ -43,6 +45,17 @@ function addPerson(callback = null) {
     const pointElement = document.createElement("td");
     pointElement.innerText = "0";
     rowElement.appendChild(pointElement);
+
+    for (let i = 0; i < FeinwertungDropdowns.length; i++) {
+        rowElement.appendChild(document.createElement("td"));
+        switch (cupTypeInput.value) {
+            case "jeder gegen jeden":
+                FFA.displayFeinwertung(4+i, FeinwertungDropdowns[i]);
+                break;
+            default:
+                throw Error("Invalid cup type " + cupTypeInput.value);
+        }
+    }
 
     contestantsTableBody.insertBefore(rowElement, newPersonRow);
     if (callback !== null) {
@@ -88,12 +101,22 @@ function renderAllPeople() {
 }
 
 function sortPlayers() {
-    const playerIndices = Data.players.map((item, index) => index)
-        .sort((i, j) => Data.players[j].points - Data.players[i].points);
+    let playerIndices
+    switch (cupTypeInput.value) {
+        case "jeder gegen jeden":
+            playerIndices = Data.players.map((item, index) => index)
+                .sort((i, j) => FFA.comparePlayers(i, j));
+            break;
+        default:
+            playerIndices = Data.players.map((item, index) => index)
+                .sort((i, j) => Data.players[j].points - Data.players[i].points);
+            break;
+    }
     const newPlayers = playerIndices.map((i) => Data.players[i]);
     const newFFAGames = playerIndices.map((i) => playerIndices.map((j) => Data.games.FFA[i][j]));
     Data.players = newPlayers;
     Data.games.FFA = newFFAGames;
+    renderAllPeople();
 }
 
 async function submit(e) {
@@ -135,7 +158,9 @@ async function submit(e) {
                 "freispiel": player.freispiel,
             }
         }),
-        "games": games
+        "games": games,
+        "feinwertungen": FeinwertungDropdowns.map((elem) => elem.value)
+            .filter((val) => ["SB", "Buchholz", "BuchholzBuchholz"].some((elem) => elem === val)),
     }
     const response = await fetch(window.location.href, {
         method: "POST",
@@ -146,6 +171,42 @@ async function submit(e) {
     })
     if (response.ok)
         console.debug(await response.json())
+}
+
+function FeinwertungSelected(index, select) {
+    sortPlayers()
+    switch (cupTypeInput.value) {
+        case "jeder gegen jeden":
+            FFA.displayFeinwertung(index, select);
+            break;
+        default:
+            throw Error("Invalid cup type")
+    }
+}
+
+function addFeinwertung() {
+    const dropdown = Blueprints.feinwertungenDropdown.cloneNode(true);
+    dropdown.id = null;
+    const contestantsTableHead = contestantsTableBody.parentElement.children[0].children[0];
+    const index = contestantsTableHead.children.length;
+    dropdown.addEventListener("change", () => {
+        FeinwertungSelected(index, dropdown);
+        if (index + 1 === contestantsTableHead.children.length)
+            addFeinwertung();
+    })
+    const tableElement = contestantsTableHead.appendChild(document.createElement("th"));
+    tableElement.scope = "col";
+    tableElement.appendChild(dropdown)
+    FeinwertungDropdowns.push(dropdown)
+    for (let i = 0; i < contestantsTableBody.children.length; i++) {
+        const row = contestantsTableBody.children[i];
+        row.appendChild(document.createElement("td"));
+    }
+    switch (cupTypeInput.value) {
+        case "jeder gegen jeden":
+            FFA.displayFeinwertung(index, dropdown);
+            break;
+    }
 }
 
 //setup function
@@ -165,4 +226,10 @@ async function submit(e) {
 
     renderAllPeople();
     cupTypeInput.dispatchEvent(new Event("change"));
+    addFeinwertung();
+    for (let i = 0; i < Data.feinwertungen.length; i++) {
+        const elem = FeinwertungDropdowns[FeinwertungDropdowns.length - 1];
+        elem.value = Data.feinwertungen[i];
+        elem.dispatchEvent(new Event("change"));
+    }
 })()

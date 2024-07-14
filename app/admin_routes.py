@@ -1,12 +1,9 @@
-import re
-from datetime import datetime
-
 from flask import Blueprint, render_template, flash, request
 from flask_login import current_user
 
 from app import app, db
-from app.models import Account, Role, Person, Mannschaft, Mannschaftsspieler, Turnier, Teilnehmer, Verein, FFATurnier, \
-    SchweizerTurnier, KOTurnier, Game
+from app.models import Account, Role, Person, Mannschaft, Mannschaftsspieler, Turnier, Teilnehmer, Game, \
+    TurnierFeinwertungen
 from app.routes import redirect
 
 bp = Blueprint('admin', __name__, url_prefix='/admin', template_folder="templates")
@@ -164,6 +161,7 @@ def edit_turnier(id: int):
     for teilnehmer in cup.teilnehmer:
         Game.query.filter_by(player1=teilnehmer).delete()
         db.session.delete(teilnehmer)
+    TurnierFeinwertungen.query.filter_by(turnier=cup).delete()
     db.session.commit()
     cup = Turnier.query.get(id)
 
@@ -180,7 +178,6 @@ def edit_turnier(id: int):
                                         age_group=player.get("ageGroup", None),
                                         turnier_type=cup.runden_art,
                                         )
-        db.session.add(player)
         players.append(player)
         cup.teilnehmer.append(player)
 
@@ -193,6 +190,8 @@ def edit_turnier(id: int):
             player2=player2,
         )
         db.session.add(game)
+    for feinwertung in request.json.get("feinwertungen", []):
+        cup.feinwertungen.append(TurnierFeinwertungen(turnier=cup, feinwertung=feinwertung))
     db.session.add(cup)
     db.session.commit()
     return request.json

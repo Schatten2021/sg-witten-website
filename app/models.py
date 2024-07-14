@@ -132,6 +132,7 @@ class Turnier(db.Model):
     runden_art: Mapped[str] = Column(String)
     display_dwz: Mapped[bool] = Column(Boolean, default=False)
     display_age_group: Mapped[bool] = Column(Boolean, default=False)
+    feinwertungen: Mapped[list["TurnierFeinwertungen"]] = relationship("TurnierFeinwertungen", back_populates="turnier")
 
     @property
     def termine(self) -> list["Termin"]:
@@ -250,3 +251,10 @@ class Game(db.Model):
         if self.result > 0:
             return 0
         return 1
+
+
+class TurnierFeinwertungen(db.Model):
+    id: Mapped[int] = Column(Integer, primary_key=True)
+    feinwertung: Mapped[str] = Column(String)
+    turnier_id: Mapped[int] = Column(ForeignKey("turnier.id"))
+    turnier: Mapped[Turnier] = relationship(back_populates="feinwertungen")

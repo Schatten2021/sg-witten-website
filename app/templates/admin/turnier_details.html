@@ -36,26 +36,32 @@
 {% endblock %}
 {% block body %}
     <div id="bp" style="display: none">
-                <label>
-                <select id="all_people">
-                    {% for person in Person.query.all() %}
-                        <option value="{{ person.id }}">{{ person.name }}, {{ person.surname }}</option>
-                    {% endfor %}
-                </select>
-                <select id="possible_game_outcomes">
-                    <option value=""></option>
-                    <option value="-2">-</option>
-                    <option value="-1">0</option>
-                    <option value="0">½</option>
-                    <option value="1">1</option>
-                    <option value="2">+</option>
-                </select>
-                <select id="all_teams">
-                    {% for team in Verein.query.all() %}
-                        <option value="{{ team.id }}">{{ team.name }}</option>
-                    {% endfor %}
-                </select>
-            </label>
+        <label>
+            <select id="Feinwertungen">
+                <option value="Buchholz">Buchhlz</option>
+                <option value="SB">SB-Zahl</option>
+                <option value="BuchholzBuchholz">Buchhlz-Buchhlz</option>
+                <option value="null" selected>---</option>
+            </select>
+            <select id="all_people">
+                {% for person in Person.query.all() %}
+                    <option value="{{ person.id }}">{{ person.name }}, {{ person.surname }}</option>
+                {% endfor %}
+            </select>
+            <select id="possible_game_outcomes">
+                <option value=""></option>
+                <option value="-2">-</option>
+                <option value="-1">0</option>
+                <option value="0">½</option>
+                <option value="1">1</option>
+                <option value="2">+</option>
+            </select>
+            <select id="all_teams">
+                {% for team in Verein.query.all() %}
+                    <option value="{{ team.id }}">{{ team.name }}</option>
+                {% endfor %}
+            </select>
+        </label>
     </div>
     <form id="form" method="post" action="/admin/turniere/{{ cup.id }}">
         <div id="general">
@@ -90,12 +96,12 @@
                         <th scope="col">Person</th>
                         <th scope="col">Verein</th>
                         <th scope="col">Punkte</th>
-                        {% if cup.display_dwz %}
-                            <th scope="col">DWZ</th>
-                        {% endif %}
-                        {% if cup.display_age_group %}
-                            <th scope="col">Altersklasse</th>
-                        {% endif %}
+{#                        {% if cup.display_dwz %}#}
+{#                            <th scope="col">DWZ</th>#}
+{#                        {% endif %}#}
+{#                        {% if cup.display_age_group %}#}
+{#                            <th scope="col">Altersklasse</th>#}
+{#                        {% endif %}#}
                     </tr>
                 </thead>
                 <tbody id="personen-table-body">
@@ -165,7 +171,8 @@
                     "id": {{ person.id }},
                     "name": "{{ person.name }}, {{ person.surname }}",
                 },
-            {% endfor %}]
+            {% endfor %}],
+            "feinwertungen": [{% for feinwertung in cup.feinwertungen %}"{{ feinwertung.feinwertung }}",{% endfor %}]
         }
         const resultsDataTable = {
             "": {
