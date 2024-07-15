@@ -85,13 +85,6 @@ const FFA = {
         FFA.render();
     },
     "addPerson": function (index, row) {
-        const id = row.children[1].children[0].value;
-        Data.players.push({
-            "verein": row.children[2].children[0].value,
-            "id": id,
-            "points": 0,
-        })
-
         //update table
         const table = gamesDiv.children[0]
         const tableHead = table.children[0].children[0];
@@ -101,11 +94,14 @@ const FFA = {
         const tableBody = table.children[1];
         for (let i = 0; i < tableBody.children.length; i++) {
             const currentRow = tableBody.children[i];
-            const dropdown = currentRow.insertBefore(document.createElement("td"), currentRow.children[currentRow.children.length - 1]).appendChild(Blueprints.resultsDropdown.cloneNode(true));
-            dropdown.id = null;
-            dropdown.className = "ffa-game";
-            dropdown.addEventListener("change", () => {
-                FFA.gameResultChange(i, index);
+            copyDropdown({
+                name: "resultsDropdown",
+                className: "ffa-game",
+                parent: currentRow,
+                next: currentRow.children[currentRow.children.length - 1],
+                callback: () => {
+                    FFA.gameResultChange(i, index);
+                }
             })
             Data.games.FFA[i].push("")
         }

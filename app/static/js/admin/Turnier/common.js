@@ -46,11 +46,35 @@ function addPerson(callback = null) {
     pointElement.innerText = "0";
     rowElement.appendChild(pointElement);
 
+    const DWZInput = rowElement
+        .appendChild(document.createElement("td"))
+        .appendChild(document.createElement("input"));
+    DWZInput.type = "number";
+    DWZInput.min = 0;
+    DWZInput.parentElement.className = "DWZ-input-td"
+    DWZInput.addEventListener("change", () => {
+        Data.players[index].DWZ = parseInt(DWZInput.value);
+    })
+    if (!showDWZInput.checked)
+        DWZInput.parentElement.style.display = "none";
+
+    const AgeGroupInput = rowElement
+        .appendChild(document.createElement("td"))
+        .appendChild(document.createElement("input"));
+    AgeGroupInput.type = "number";
+    AgeGroupInput.min = 0;
+    AgeGroupInput.parentElement.className = "age-input-td"
+    AgeGroupInput.addEventListener("change", () => {
+        Data.players[index].ageGroup = parseInt(AgeGroupInput.value);
+    })
+    if (!showAgeInput.checked)
+        AgeGroupInput.parentElement.style.display = "none";
+
     for (let i = 0; i < FeinwertungDropdowns.length; i++) {
         rowElement.appendChild(document.createElement("td"));
         switch (cupTypeInput.value) {
             case "jeder gegen jeden":
-                FFA.displayFeinwertung(4+i, FeinwertungDropdowns[i]);
+                FFA.displayFeinwertung(6+i, FeinwertungDropdowns[i]);
                 break;
             default:
                 throw Error("Invalid cup type " + cupTypeInput.value);
@@ -62,6 +86,12 @@ function addPerson(callback = null) {
         callback(index, newPersonRow);
         return;
     }
+
+    Data.players.push({
+            "verein": teamDropdown.value,
+            "id": personDropdown.value,
+            "points": 0,
+        })
     switch (cupTypeInput.value) {
         case "jeder gegen jeden":
             FFA.addPerson(index, rowElement);
@@ -70,16 +100,6 @@ function addPerson(callback = null) {
             console.error("Unhandled cup type " + cupTypeInput.value);
             break;
     }
-}
-
-function getSelectedPeople() {
-    let selectedPeople = [];
-    for (let i = 0; i < contestantsTableBody.children.length - 1; i++) {
-        const row = contestantsTableBody.children[i];
-        const personDropdown = row.children[1];
-        selectedPeople.push(personDropdown.value);
-    }
-    return selectedPeople;
 }
 function getPlayerName(id) {
     id = parseInt(id)
@@ -97,6 +117,8 @@ function renderAllPeople() {
         row.children[1].children[0].value = player.id;
         row.children[2].children[0].value = player.verein;
         row.children[3].innerText = player.points;
+        row.children[4].children[0].value = player.DWZ;
+        row.children[5].children[0].value = player.ageGroup;
     }
 }
 
@@ -156,6 +178,8 @@ async function submit(e) {
                 "personId": player.id,
                 "vereinsId": player.verein,
                 "freispiel": player.freispiel,
+                "DWZ": player.DWZ,
+                "ageGroup": player.ageGroup,
             }
         }),
         "games": games,
@@ -209,6 +233,35 @@ function addFeinwertung() {
     }
 }
 
+function changeStyleOfClass(className = "", styleName = "display", newValue = "none") {
+    const elements = document.getElementsByClassName(className)
+    for (let i = 0; i < elements.length; i++) {
+        elements[i].style[styleName] = newValue;
+    }
+}
+
+function copyDropdown({name = "", callback = () => {}, className = "", parent = undefined, next = undefined, createTD = true}) {
+    const dropdown = Blueprints[name].cloneNode(true);
+    dropdown.id = null;
+    dropdown.addEventListener("change", callback)
+    dropdown.className = className;
+    let elem;
+    if (createTD) {
+        elem = document.createElement("td");
+        elem.appendChild(dropdown);
+    } else {
+        elem = dropdown;
+    }
+    if (parent === undefined)
+        return elem;
+    if (next === undefined) {
+        parent.appendChild(elem);
+    } else {
+        parent.insertBefore(elem, next);
+    }
+    return elem;
+}
+
 //setup function
 (() => {
     sortPlayers()
@@ -232,4 +285,18 @@ function addFeinwertung() {
         elem.value = Data.feinwertungen[i];
         elem.dispatchEvent(new Event("change"));
     }
+    showAgeInput.addEventListener("change", () => {
+        if (showAgeInput.checked)
+            changeStyleOfClass("age-input-td", "display", "")
+        else
+            changeStyleOfClass("age-input-td", "display", "none")
+    })
+    showAgeInput.checked = Data.showAge;
+    showDWZInput.addEventListener("change", () => {
+        if (showDWZInput.checked)
+            changeStyleOfClass("DWZ-input-td", "display", "")
+        else
+            changeStyleOfClass("DWZ-input-td", "display", "none")
+    })
+    showDWZInput.checked = Data.showDWZ;
 })()

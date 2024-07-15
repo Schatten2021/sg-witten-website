@@ -174,7 +174,7 @@ def edit_turnier(id: int):
                                         turnier=cup,
                                         vereins_id=player.get("vereinsId", -1),
                                         freispiel=player.get("freispiel", False),
-                                        dwz=player.get("dwz", None),
+                                        dwz=player.get("DWZ", None),
                                         age_group=player.get("ageGroup", None),
                                         turnier_type=cup.runden_art,
                                         )

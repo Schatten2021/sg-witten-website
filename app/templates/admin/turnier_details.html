@@ -72,12 +72,12 @@
             </h1>
             <label>
                 DWZ Anzeigen:
-                <input type="checkbox" value="{{ cup.display_dwz }}" id="show-DWZ-Input">
-            </label>
+                <input type="checkbox" id="show-DWZ-Input"{% if cup.display_dwz %} checked{% endif %}>
+            </label><br>
             <label>
                 Altersgruppen anzeigen:
-                <input type="checkbox" value="{{ cup.display_age_group }}" id="show-age-Input">
-            </label>
+                <input type="checkbox" id="show-age-Input"{% if cup.display_age_group %} checked{% endif %}>
+            </label><br>
             {# TODO: date input #}
             <label>
                 Turnierart:
@@ -96,12 +96,8 @@
                         <th scope="col">Person</th>
                         <th scope="col">Verein</th>
                         <th scope="col">Punkte</th>
-{#                        {% if cup.display_dwz %}#}
-{#                            <th scope="col">DWZ</th>#}
-{#                        {% endif %}#}
-{#                        {% if cup.display_age_group %}#}
-{#                            <th scope="col">Altersklasse</th>#}
-{#                        {% endif %}#}
+                        <th scope="col" class="DWZ-input-td"{% if not cup.display_dwz %} style="display: none"{% endif %}>DWZ</th>
+                        <th scope="col" class="age-input-td"{% if not cup.display_age_group %} style="display: none"{% endif %}>Altersklasse</th>
                     </tr>
                 </thead>
                 <tbody id="personen-table-body">
@@ -156,7 +152,9 @@
                     "id": {{ player.person.id }},
                     "verein": {{ player.verein.id }},
                     "points": {{ player.points }},
-                    "freispiel": {{ "true" if player.freispiel else "false" }}
+                    "freispiel": {{ "true" if player.freispiel else "false" }},
+                    "DWZ": {{ player.dwz if player.dwz is not none else 'null' }},
+                    "ageGroup": {{ player.age_group if player.age_group is not none else 'null' }}
                 },{% endfor %}
             ],
             "games": {
@@ -172,7 +170,9 @@
                     "name": "{{ person.name }}, {{ person.surname }}",
                 },
             {% endfor %}],
-            "feinwertungen": [{% for feinwertung in cup.feinwertungen %}"{{ feinwertung.feinwertung }}",{% endfor %}]
+            "feinwertungen": [{% for feinwertung in cup.feinwertungen %}"{{ feinwertung.feinwertung }}",{% endfor %}],
+            "showDWZ": {{ "true" if cup.display_dwz else 'false' }},
+            "showAge": {{ 'true' if cup.display_age_group else 'false' }},
         }
         const resultsDataTable = {
             "": {
