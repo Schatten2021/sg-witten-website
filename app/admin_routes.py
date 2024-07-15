@@ -167,6 +167,7 @@ def edit_turnier(id: int):
 
     cup.name = request.json.get("name")
     cup.runden_art = request.json.get("type")
+    cup.description = request.json.get("description", "---")
 
     players = []
     for player in request.json.get("players", []):

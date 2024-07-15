@@ -86,6 +86,10 @@
                     <option value="Schweizer"{% if isinstance(cup, SchweizerTurnier) %} selected{% endif %}>Schweizer System</option>
                     <option value="jeder gegen jeden"{% if isinstance(cup, FFATurnier) %} selected{% endif %}>Jeder gegen jeden</option>
                 </select>
+            </label><br>
+            <label style="width: 100%;">
+                Infotext:<br>
+                <textarea style="width: 100%; resize: none" id="description">{{ cup.description }}</textarea>
             </label>
         </div>
         <div>

@@ -12,6 +12,7 @@ const Blueprints = {
     "feinwertungenDropdown": document.getElementById("Feinwertungen"),
 }
 let FeinwertungDropdowns = []
+const descriptionInput = document.getElementById("description");
 function addPerson(callback = null) {
     const index = contestantsTableBody.children.length - 1;
     const rowElement = document.createElement("tr");
@@ -185,6 +186,7 @@ async function submit(e) {
         "games": games,
         "feinwertungen": FeinwertungDropdowns.map((elem) => elem.value)
             .filter((val) => ["SB", "Buchholz", "BuchholzBuchholz"].some((elem) => elem === val)),
+        "description": descriptionInput.value,
     }
     const response = await fetch(window.location.href, {
         method: "POST",
@@ -299,4 +301,9 @@ function copyDropdown({name = "", callback = () => {}, className = "", parent = 
             changeStyleOfClass("DWZ-input-td", "display", "none")
     })
     showDWZInput.checked = Data.showDWZ;
+    descriptionInput.addEventListener("input", () => {
+        descriptionInput.style.height = "5px"
+        descriptionInput.style.height = descriptionInput.scrollHeight + 5 + 'px';
+    })
+    descriptionInput.dispatchEvent(new Event("input"))
 })()
