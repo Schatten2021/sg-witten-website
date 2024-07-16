@@ -62,6 +62,12 @@
                 {% endfor %}
             </select>
         </label>
+        <div id="dateInput" class="date-input-div">
+            <label>
+                <input type="datetime-local" class="date-input-start"> - <input type="datetime-local" class="date-input-end">
+                <button type="button" class="btn"><i class="fa-solid fa-trash"></i></button>
+            </label>
+        </div>
     </div>
     <form id="form" method="post" action="/admin/turniere/{{ cup.id }}">
         <div id="general">
@@ -78,7 +84,6 @@
                 Altersgruppen anzeigen:
                 <input type="checkbox" id="show-age-Input"{% if cup.display_age_group %} checked{% endif %}>
             </label><br>
-            {# TODO: date input #}
             <label>
                 Turnierart:
                 <select name="turnier_type" id="turnier-art-select">
@@ -92,6 +97,10 @@
                 <textarea style="width: 100%; resize: none" id="description">{{ cup.description }}</textarea>
             </label>
         </div>
+        {# TODO: date input #}
+        <div id="dates" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(28.85rem, 1fr)); gap: 1rem">
+        </div>
+        <button class="btn" type="button" onclick="addDateInput()">+</button>
         <div>
             <table class="table table-bordered">
                 <thead>
@@ -177,6 +186,13 @@
             "feinwertungen": [{% for feinwertung in cup.feinwertungen %}"{{ feinwertung.feinwertung }}",{% endfor %}],
             "showDWZ": {{ "true" if cup.display_dwz else 'false' }},
             "showAge": {{ 'true' if cup.display_age_group else 'false' }},
+            "dates": [{% for termin in cup.termine %}
+                {
+                    "start": "{{ termin.start.isoformat() }}",
+                    "end": "{{ termin.end.isoformat() }}",
+                },
+            {% endfor %}]
+
         }
         const resultsDataTable = {
             "": {

@@ -5,11 +5,13 @@ const cupTypeInput = document.getElementById("turnier-art-select");
 const showDWZInput = document.getElementById("show-DWZ-Input");
 const showAgeInput = document.getElementById("show-age-Input");
 const newPersonRow = contestantsTableBody.children[0];
+const datesInputDiv = document.getElementById("dates")
 const Blueprints = {
     "peopleDropdown": document.getElementById("all_people"),
     "teamDropdown": document.getElementById("all_teams"),
     "resultsDropdown": document.getElementById("possible_game_outcomes"),
     "feinwertungenDropdown": document.getElementById("Feinwertungen"),
+    "dateInput": document.getElementById("dateInput"),
 }
 let FeinwertungDropdowns = []
 const descriptionInput = document.getElementById("description");
@@ -187,6 +189,7 @@ async function submit(e) {
         "feinwertungen": FeinwertungDropdowns.map((elem) => elem.value)
             .filter((val) => ["SB", "Buchholz", "BuchholzBuchholz"].some((elem) => elem === val)),
         "description": descriptionInput.value,
+        "dates": Data.dates.filter((elem) => elem.start !== "" && elem.end !== ""),
     }
     const response = await fetch(window.location.href, {
         method: "POST",
@@ -264,6 +267,44 @@ function copyDropdown({name = "", callback = () => {}, className = "", parent = 
     return elem;
 }
 
+function addDateInput(addToData=true) {
+    const index = datesInputDiv.children.length;
+    if (addToData)
+        Data.dates.push({"start": "", "end": ""})
+    const elem = datesInputDiv.insertBefore(Blueprints.dateInput.cloneNode(true), datesInputDiv.children[datesInputDiv.children.length-1]);
+    elem.id = undefined;
+    const label = elem.children[0]
+    const deleteButton = label.children[2];
+    deleteButton.addEventListener("click", () => {
+        Data.dates[index] = {"start": "", "end": ""}
+        elem.remove()
+    })
+    const startInput = label.children[0];
+    startInput.addEventListener("change", () => {
+        Data.dates[index].start = getDate(startInput).toISOString()
+    })
+    const endInput = label.children[1];
+    endInput.addEventListener("change", () => {
+        Data.dates[index].end = getDate(endInput).toISOString()
+    })
+    return label;
+}
+
+function setDate(input, date = new Date().toISOString()) {
+    date = new Date(date);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = (date.getDate()).toString().padStart(2, "0");
+    const hour = (date.getHours()).toString().padStart(2, "0");
+    const minute = (date.getMinutes()).toString().padStart(2, "0");
+    const string = `${year}-${month}-${day}T${hour}:${minute}`;
+    console.debug("setting ", input, string)
+    input.value = string;
+}
+function getDate(input) {
+    return new Date(input.value)
+}
+
 //setup function
 (() => {
     sortPlayers()
@@ -306,4 +347,10 @@ function copyDropdown({name = "", callback = () => {}, className = "", parent = 
         descriptionInput.style.height = descriptionInput.scrollHeight + 5 + 'px';
     })
     descriptionInput.dispatchEvent(new Event("input"))
+    for (let i = 0; i < Data.dates.length; i++) {
+        const date = Data.dates[i];
+        const label = addDateInput(false);
+        setDate(label.children[0], date.start);
+        setDate(label.children[1], date.end)
+    }
 })()

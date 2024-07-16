@@ -133,10 +133,7 @@ class Turnier(db.Model):
     display_dwz: Mapped[bool] = Column(Boolean, default=False)
     display_age_group: Mapped[bool] = Column(Boolean, default=False)
     feinwertungen: Mapped[list["TurnierFeinwertungen"]] = relationship("TurnierFeinwertungen", back_populates="turnier")
-
-    @property
-    def termine(self) -> list["Termin"]:
-        return Termin.query.filter_by(turnier_id=self.id).all()
+    termine: Mapped[list["Termin"]] = relationship("Termin", back_populates="turnier")
 
     __mapper_args__ = {
         "polymorphic_identity": "Turnier",
@@ -223,7 +220,7 @@ class KOTeilnehmer(Teilnehmer):
 class Termin(db.Model):
     id: Mapped[int] = Column(Integer, primary_key=True)
     turnier_id: Mapped[int] = Column(ForeignKey("turnier.id"))
-    turnier: Mapped[Turnier] = relationship("Turnier")
+    turnier: Mapped[Turnier] = relationship("Turnier", back_populates="termine")
     start: Mapped[datetime] = Column(DateTime)
     end: Mapped[datetime] = Column(DateTime)
 
