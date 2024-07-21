@@ -97,7 +97,6 @@
                 <textarea style="width: 100%; resize: none" id="description">{{ cup.description }}</textarea>
             </label>
         </div>
-        {# TODO: date input #}
         <div id="dates" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(28.85rem, 1fr)); gap: 1rem">
         </div>
         <button class="btn" type="button" onclick="addDateInput()">+</button>
@@ -175,7 +174,14 @@
                 	[{% for opponent in cup.teilnehmer %}{% with result=player.get_result_against(opponent) %}
                         "{{ result if result != None else "" }}",
                 	{% endwith %}{% endfor %}],
-                {% endfor %}{% endif %}]
+                {% endfor %}{% endif %}],
+                "KO": [{% for game in cup.games %}
+                    {
+                        "player1": {{ cup.teilnehmer.index(game.player1) }},
+                        "player2": {{ cup.teilnehmer.index(game.player2) }},
+                        "result": "{{ game.result }}",
+                    },
+                    {% endfor %}],
             },
             "people": [{% for person in Person.query.all() %}
                 {

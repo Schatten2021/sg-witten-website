@@ -135,6 +135,10 @@ class Turnier(db.Model):
     feinwertungen: Mapped[list["TurnierFeinwertungen"]] = relationship("TurnierFeinwertungen", back_populates="turnier")
     termine: Mapped[list["Termin"]] = relationship("Termin", back_populates="turnier")
 
+    @property
+    def games(self) -> list["Game"]:
+        return Game.query.filter(or_(Game.player1.in_(self.teilnehmer), Game.player2.in_(self.teilnehmer))).all()
+
     __mapper_args__ = {
         "polymorphic_identity": "Turnier",
         "polymorphic_on": runden_art
