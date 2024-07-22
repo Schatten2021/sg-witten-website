@@ -1,5 +1,7 @@
 const KO = {
     "render": function () {
+        gamesDiv.innerHTML = "";
+        sortPlayers();
     },
     "getPlayerPoints": function (playerIndex) {
         const gameVictories = Data.games.KO
@@ -33,11 +35,57 @@ const KO = {
             if (game.player1 === currentPlayerIndex)
                 return i * 4;
             if (game.player2 === currentPlayerIndex)
-                return i * 4 + 2
+                return i * 4 + 2;
         }
         return undefined;
     },
     "getGameLayer": function (game) {
         return Math.min(KO.getPlayerPoints(game.player1), KO.getPlayerIndex(game.player2));
+    },
+    "updateGames": function () {
+        const allGames = Data.games.KO.flat();
+        const gamesLayers = allGames.map((game) => KO.getGameLayer(game));
+
+        //generate layers
+        const layerCount = nextPowerOfTwo(allGames.length);
+        let layers = [];
+        for (let i = 0; i < layerCount; i++) {
+            layers.push([])
+        }
+        for (let i = 0; i < allGames.length; i++) {
+            const game = allGames[i];
+            const gamesLayer = gamesLayers[i];
+            layers[gamesLayer].push(game);
+        }
+        for (let i = layers.length - 2; i > 0; i--) {
+            const layer = layers[i];
+            const layerIndices = layer.map((value, index) => index)
+            const previousLayer = layers[i+1];
+            let previousLayerPlayerIndices = {}
+            for (let j = 0; j < previousLayerPlayerIndices.length; j++) {
+                const game = previousLayer[j]
+                previousLayerPlayerIndices[game.player1] = j * 2;
+                previousLayerPlayerIndices[game.player2] = j * 2 + 1;
+            }
+            const layerTargetIndices = layer.map((game) => {
+                if (previousLayerPlayerIndices[game.player1] !== undefined)
+                    return previousLayerPlayerIndices[game.player1];
+                if (previousLayerPlayerIndices[game.player2] !== undefined)
+                    return previousLayerPlayerIndices[game.player2];
+                return undefined
+            })
+            const newLayerIndices = layerIndices.sort((i, j) => {
+                const game1Index = layerTargetIndices[i];
+                const game2Index = layerTargetIndices[j];
+                if (game1Index !== undefined && game2Index !== undefined)
+                    return game1Index - game2Index;
+                if (game1Index === undefined)
+                    return 1;
+                if (game2Index === undefined)
+                    return -1;
+                return 0;
+            })
+            layers[i] = newLayerIndices.map((j) => layer[j]);
+        }
     },
 }

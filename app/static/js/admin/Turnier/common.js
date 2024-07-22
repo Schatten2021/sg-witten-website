@@ -153,6 +153,26 @@ function sortPlayers() {
     Data.games.KO = newKOGames;
     renderAllPeople();
 }
+function nextPowerOfTwo(elem = 0) {
+    // check if it isn't a power of 2 already
+    // this works because subtracting one will basically subtract from the closest set bit.
+    // When this is the only set bit in the entire number, it changes all bits in the number.
+    // Otherwise, it leaves some bits.
+    //e.g. 1000 -> 0111 => 0000
+    // vs. 1010 -> 1001 => 1000
+
+    if (((elem - 1) | elem) === 0)
+        return elem;
+
+    //shifting the elements and then oring the result, so that all bits  are set.
+    let shifted = elem;
+    let result = elem;
+    while (shifted !== 0) {
+        shifted >>= 1;
+        result |= shifted;
+    }
+    return result+1;
+}
 
 async function submit(e) {
     e.preventDefault();
