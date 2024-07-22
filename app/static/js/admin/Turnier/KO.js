@@ -2,6 +2,52 @@ const KO = {
     "render": function () {
         gamesDiv.innerHTML = "";
         sortPlayers();
+        KO.updateGames();
+        const table = gamesDiv.appendChild(document.createElement("table"));
+        table.className = "table table-bordered";
+        KO.renderTableHeader(table.appendChild(document.createElement("thead")).appendChild(document.createElement("tr")));
+        KO.renderTableBody(table.appendChild(document.createElement("tbody")));
+    },
+    "renderTableHeader": function (tr) {
+        const players = KO.getSortedPlayers();
+        for (let i = 0; i < players.length; i++) {
+            const player = players[i];
+            const element = tr.appendChild(document.createElement("th"));
+            element.scope = "col";
+            element.innerText = player === undefined ? "freispiel" : getPlayerName(player.id);
+        }
+    },
+    "renderTableBody": function (tbody) {
+        const playerCount = KO.totalPlayerCount();
+        for (let i = 0; i < Data.games.KO.length; i++) {
+            const games = Data.games.KO[i];
+            const row = tbody.appendChild(document.createElement("tr"));
+            for (let j = 0; j < (playerCount >> i); j++) {
+                const game = games[i]
+                if (game === undefined) {
+                    const element = copyDropdown({
+                        name: "resultsDropdown",
+                        parent: row,
+                        className: resultsDataTable[""].class
+                    })
+                    // 2 ** i
+                    element.colSpan = 1 << i;
+                    continue
+                }
+                const player1 = j & 1 === 0;
+                const resultInfo = resultsDataTable[(player1 ? game.result : resultsDataTable[game.result].opposite)]
+                const element = copyDropdown({
+                    name: "resultsDropdown",
+                    className: resultInfo.class,
+                    parent: row,
+                })
+                const dropdown = element.children[0];
+                dropdown.value = (player1 ? game.result : resultInfo.opposite)
+                console.debug(element)
+                // 2 ** i
+                element.colSpan = 1 << i;
+            }
+        }
     },
     "getPlayerPoints": function (playerIndex) {
         const gameVictories = Data.games.KO
@@ -17,6 +63,41 @@ const KO = {
             return resultsDataTable[game.result].points;
         return resultsDataTable[resultsDataTable[game.result].opposite].points;
     },
+    "totalPlayerCount": function () {
+        const freispielCount = Data.players.reduce((previousValue, currentValue) => previousValue + (currentValue.freispiel ? 1 : 0), 0);
+        const result = nextPowerOfTwo(Data.players.length + freispielCount);
+        return result === 1 ? 2 : result;
+    },
+    "getSortedPlayers": function () {
+        let playerIndices = Data.players.map((value, index) => KO.getPlayerIndex(index));
+        let sortedPlayers = [];
+        const totalElementsInSortedPlayers = KO.totalPlayerCount()
+        for (let i = 0; i < totalElementsInSortedPlayers; i++)
+            sortedPlayers.push(undefined)
+        let playersWithoutIndex = []
+        for (let i = 0; i < playerIndices.length; i++) {
+            const player = Data.players[i];
+            const index = playerIndices[i];
+            if (index === undefined)
+                playersWithoutIndex.push(player)
+            else
+                sortedPlayers[index] = player;
+        }
+        let missingPlayerIndex = 0;
+        for (let i = 0; i < sortedPlayers.length; i++) {
+            if (sortedPlayers[i] !== undefined)
+                continue
+            const player = playersWithoutIndex[missingPlayerIndex];
+            if (player === undefined)
+                continue
+            missingPlayerIndex++;
+            sortedPlayers[i] = player;
+            if (player.freispiel) {
+                i++;
+            }
+        }
+        return sortedPlayers
+    },
     "getPlayerIndex": function (currentPlayerIndex) {
         //first layer
         if (Data.games.KO.length === 0)
@@ -29,6 +110,8 @@ const KO = {
             if (game.player2 === currentPlayerIndex)
                 return i * 2 + 1
         }
+        if (Data.games.KO.length === 1)
+            return undefined
         const secondLayerGames = Data.games.KO[1];
         for (let i = 0; i < secondLayerGames.length; i++) {
             const game = secondLayerGames[i];
@@ -42,14 +125,20 @@ const KO = {
     "getGameLayer": function (game) {
         return Math.min(KO.getPlayerPoints(game.player1), KO.getPlayerIndex(game.player2));
     },
+    "getLayerCount": function () {
+        const playerCount = KO.totalPlayerCount();
+        let count = 0;
+        while ((1 << count) < playerCount)
+            count++;
+        return count;
+    },
     "updateGames": function () {
         const allGames = Data.games.KO.flat();
         const gamesLayers = allGames.map((game) => KO.getGameLayer(game));
 
         //generate layers
-        const layerCount = nextPowerOfTwo(allGames.length);
         let layers = [];
-        for (let i = 0; i < layerCount; i++) {
+        for (let i = 0; i < KO.getLayerCount(); i++) {
             layers.push([])
         }
         for (let i = 0; i < allGames.length; i++) {
@@ -87,5 +176,9 @@ const KO = {
             })
             layers[i] = newLayerIndices.map((j) => layer[j]);
         }
+        Data.games.KO = layers
+    },
+    "addPerson": function (index, rowElement) {
+        KO.render()
     },
 }

@@ -13,6 +13,38 @@ const Blueprints = {
     "feinwertungenDropdown": document.getElementById("Feinwertungen"),
     "dateInput": document.getElementById("dateInput"),
 }
+const resultsDataTable = {
+    "": {
+        "opposite": "",
+        "class": "",
+        "points": 0,
+    },
+    "-2": {
+        "opposite": "2",
+        "class": "lost-KL",
+        "points": 0,
+    },
+    "-1": {
+        "opposite": "1",
+        "class": "lost",
+        "points": 0,
+    },
+    "0": {
+        "opposite": "0",
+        "class": "remi",
+        "points": .5,
+    },
+    "1": {
+        "opposite": "-1",
+        "class": "won",
+        "points": 1,
+    },
+    "2": {
+        "opposite": "-2",
+        "class": "won-KL",
+        "points": 1,
+    }
+}
 let FeinwertungDropdowns = []
 const descriptionInput = document.getElementById("description");
 function addPerson(callback = null) {
@@ -79,13 +111,15 @@ function addPerson(callback = null) {
             case "jeder gegen jeden":
                 FFA.displayFeinwertung(6+i, FeinwertungDropdowns[i]);
                 break;
+            case "K.O.":
+                break
             default:
                 throw Error("Invalid cup type " + cupTypeInput.value);
         }
     }
 
     contestantsTableBody.insertBefore(rowElement, newPersonRow);
-    if (callback !== null) {
+    if (callback) {
         callback(index, newPersonRow);
         return;
     }
@@ -98,7 +132,10 @@ function addPerson(callback = null) {
     switch (cupTypeInput.value) {
         case "jeder gegen jeden":
             FFA.addPerson(index, rowElement);
-            break;
+            break
+        case "K.O.":
+            KO.addPerson(index, rowElement);
+            break
         default:
             console.error("Unhandled cup type " + cupTypeInput.value);
             break;
@@ -132,25 +169,24 @@ function sortPlayers() {
             playerIndices = Data.players.map((item, index) => index)
                 .sort((i, j) => FFA.comparePlayers(i, j));
             break;
-        case "K.O.":
-            playerIndices = Data.players.map((player, index) => KO.getPlayerIndex(index))
-            break
         default:
             playerIndices = Data.players.map((item, index) => index)
                 .sort((i, j) => Data.players[j].points - Data.players[i].points);
             break
     }
-    const newPlayers = playerIndices.map((i) => Data.players[i]);
-    const newFFAGames = playerIndices.map((i) => playerIndices.map((j) => Data.games.FFA[i][j]));
-    const newKOGames = Data.games.KO.map((layer) => layer
-        .map((value) => ({
-            "player1": KO.getPlayerIndex(value.player1),
-            "player2": KO.getPlayerIndex(value.player2),
-            "result": value.result,
-        })));
-    Data.players = newPlayers;
-    Data.games.FFA = newFFAGames;
-    Data.games.KO = newKOGames;
+    Data.players = playerIndices.map((i) => Data.players[i]);
+    switch (cupTypeInput.value) {
+        case "jeder gegen jeden":
+            Data.games.FFA = playerIndices.map((i) => playerIndices.map((j) => Data.games.FFA[i][j]));
+            break
+        case "K.O.":
+            Data.games.KO = Data.games.KO.map((layer) => layer
+                .map((value) => ({
+                    "player1": KO.getPlayerIndex(value.player1),
+                    "player2": KO.getPlayerIndex(value.player2),
+                    "result": value.result,
+                })));
+    }
     renderAllPeople();
 }
 function nextPowerOfTwo(elem = 0) {
@@ -161,7 +197,7 @@ function nextPowerOfTwo(elem = 0) {
     //e.g. 1000 -> 0111 => 0000
     // vs. 1010 -> 1001 => 1000
 
-    if (((elem - 1) | elem) === 0)
+    if (((elem - 1) & elem) === 0)
         return elem;
 
     //shifting the elements and then oring the result, so that all bits  are set.
@@ -343,10 +379,13 @@ function getDate(input) {
         switch (cupTypeInput.value) {
             case "jeder gegen jeden":
                 FFA.render();
-                break;
+                break
+            case "K.O.":
+                KO.render();
+                break
             default:
                 console.error(`Unhandled cup type ${cupTypeInput.value}`);
-                break;
+                break
         }
     });
 

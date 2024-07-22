@@ -202,41 +202,9 @@
             {% endfor %}]
 
         }
-        const resultsDataTable = {
-            "": {
-                "opposite": "",
-                "class": "",
-                "points": 0,
-            },
-            "-2": {
-                "opposite": "2",
-                "class": "lost-KL",
-                "points": 0,
-            },
-            "-1": {
-                "opposite": "1",
-                "class": "lost",
-                "points": 0,
-            },
-            "0": {
-                "opposite": "0",
-                "class": "remi",
-                "points": .5,
-            },
-            "1": {
-                "opposite": "-1",
-                "class": "won",
-                "points": 1,
-            },
-            "2": {
-                "opposite": "-2",
-                "class": "won-KL",
-                "points": 1,
-            }
-        }
     </script>
     <script src="/static/js/admin/Turnier/FFA.js"></script>
     {# TODO: Schweizer #}
-    {# TODO: K.O. #}
+    <script src="/static/js/admin/Turnier/KO.js"></script>
     <script src="/static/js/admin/Turnier/common.js"></script>
 {% endblock %}
