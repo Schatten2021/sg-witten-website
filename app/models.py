@@ -147,6 +147,16 @@ class Turnier(db.Model):
 
 # Turnierarten
 class FFATurnier(Turnier):
+    @property
+    def levels(self) -> list[list["Game"]]:
+        game_levels: dict["Game", int] = {game: min(game.player1.points, game.player2.points)
+                                          for game in self.games}
+        max_level = max(game_levels.values())
+        levels = [[]] * max_level
+        for game in self.games:
+            levels[game_levels[game]].append(game)
+        return levels
+
     __mapper_args__ = {
         "polymorphic_identity": "jeder gegen jeden"
     }

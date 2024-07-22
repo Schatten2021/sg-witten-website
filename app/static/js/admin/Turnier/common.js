@@ -132,15 +132,25 @@ function sortPlayers() {
             playerIndices = Data.players.map((item, index) => index)
                 .sort((i, j) => FFA.comparePlayers(i, j));
             break;
+        case "K.O.":
+            playerIndices = Data.players.map((player, index) => KO.getPlayerIndex(index))
+            break
         default:
             playerIndices = Data.players.map((item, index) => index)
                 .sort((i, j) => Data.players[j].points - Data.players[i].points);
-            break;
+            break
     }
     const newPlayers = playerIndices.map((i) => Data.players[i]);
     const newFFAGames = playerIndices.map((i) => playerIndices.map((j) => Data.games.FFA[i][j]));
+    const newKOGames = Data.games.KO.map((layer) => layer
+        .map((value) => ({
+            "player1": KO.getPlayerIndex(value.player1),
+            "player2": KO.getPlayerIndex(value.player2),
+            "result": value.result,
+        })));
     Data.players = newPlayers;
     Data.games.FFA = newFFAGames;
+    Data.games.KO = newKOGames;
     renderAllPeople();
 }
 

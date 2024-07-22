@@ -175,13 +175,15 @@
                         "{{ result if result != None else "" }}",
                 	{% endwith %}{% endfor %}],
                 {% endfor %}{% endif %}],
-                "KO": [{% for game in cup.games %}
-                    {
-                        "player1": {{ cup.teilnehmer.index(game.player1) }},
-                        "player2": {{ cup.teilnehmer.index(game.player2) }},
-                        "result": "{{ game.result }}",
-                    },
+                "KO": [{% if isinstance(cup, KOTurnier) %}{% for level in cup.levels %}
+                	[{% for game in level %}
+                        {
+                            "player1": {{ cup.teilnehmer.index(game.player1) }},
+                            "player2": {{ cup.teilnehmer.index(game.player2) }},
+                            "result": {{ game.result }},
+                        },
                     {% endfor %}],
+                {% endfor %}{% endif %}],
             },
             "people": [{% for person in Person.query.all() %}
                 {
