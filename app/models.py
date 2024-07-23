@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import or_, and_, Column, Integer, ForeignKey, Boolean, DateTime, String, Float
-from sqlalchemy.orm import Mapped, relationship
+from sqlalchemy.orm import Mapped, relationship, backref
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import db
@@ -145,35 +145,6 @@ class Turnier(db.Model):
     }
 
 
-# Turnierarten
-class FFATurnier(Turnier):
-    @property
-    def levels(self) -> list[list["Game"]]:
-        game_levels: dict["Game", int] = {game: min(game.player1.points, game.player2.points)
-                                          for game in self.games}
-        max_level = max(game_levels.values())
-        levels = [[]] * max_level
-        for game in self.games:
-            levels[game_levels[game]].append(game)
-        return levels
-
-    __mapper_args__ = {
-        "polymorphic_identity": "jeder gegen jeden"
-    }
-
-
-class SchweizerTurnier(Turnier):
-    __mapper_args__ = {
-        "polymorphic_identity": "Schweizer"
-    }
-
-
-class KOTurnier(Turnier):
-    __mapper_args__ = {
-        "polymorphic_identity": "K.O."
-    }
-
-
 # Teilnehmer
 class Teilnehmer(db.Model):
     id: Mapped[int] = Column(Integer, primary_key=True)
@@ -225,6 +196,50 @@ class SchweizerTeilnehmer(Teilnehmer):
 
 
 class KOTeilnehmer(Teilnehmer):
+    teilnehmer_id: Mapped[int] = Column(ForeignKey("teilnehmer.id"))
+    teilnehmer: Mapped["Teilnehmer"] = relationship("Teilnehmer")
+    turnier: Mapped["KOTurnier"] = relationship("KOTurnier", back_populates="teilnehmer")
+    index: Mapped[int] = Column(Integer, primary_key=True)
+    __mapper_args__ = {
+        "polymorphic_identity": "K.O.",
+    }
+
+
+# Turnierarten
+class FFATurnier(Turnier):
+    __mapper_args__ = {
+        "polymorphic_identity": "jeder gegen jeden"
+    }
+
+
+class SchweizerTurnier(Turnier):
+    __mapper_args__ = {
+        "polymorphic_identity": "Schweizer"
+    }
+
+
+class KOTurnier(Turnier):
+    # teilnehmer: Mapped["KOTeilnehmer"] = relationship("KOTeilnehmer", order_by=KOTeilnehmer.index, back_populates="turnier")
+    games: Mapped[list["KOGame"]] = relationship("KOGame", back_populates="turnier")
+
+    @property
+    def levels(self) -> list[list["KOGame"]]:
+        teilnehmer_count = len(self.teilnehmer)
+        # basically ceil(log_2(teilnehmer_count))
+        layer_count = len(bin(teilnehmer_count)) - 2
+        layers = [[]] * layer_count
+
+        for game in self.games:
+            game: KOGame
+            if len(layers) < game.level:
+                print(Warning("Game on invalid level, deleting!"))
+                db.session.delete(game)
+                self.games.remove(game)
+                db.session.commit()
+                continue
+            layers[game.level].append(game)
+        return layers
+
     __mapper_args__ = {
         "polymorphic_identity": "K.O."
     }
@@ -263,6 +278,22 @@ class Game(db.Model):
             return 0
         return 1
 
+
+class KOGame(db.Model):
+    id: Mapped[int] = Column(Integer, primary_key=True)
+    turnier_id: Mapped[int] = Column(ForeignKey("turnier.id"))
+    turnier: Mapped["KOTurnier"] = relationship("KOTurnier", back_populates="games")
+    whiteVictory: Mapped[bool] = Column(Boolean, default=True)
+    kampflos: Mapped[bool] = Column(Boolean, default=False)
+    level: Mapped[int] = Column(Integer)
+    index: Mapped[int] = Column(Integer)
+
+    @property
+    def result(self) -> int:
+        value = 1 if self.whiteVictory else -1
+        if self.kampflos:
+            value *= 2
+        return value
 
 class TurnierFeinwertungen(db.Model):
     id: Mapped[int] = Column(Integer, primary_key=True)

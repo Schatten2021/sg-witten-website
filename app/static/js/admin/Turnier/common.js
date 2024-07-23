@@ -18,31 +18,37 @@ const resultsDataTable = {
         "opposite": "",
         "class": "",
         "points": 0,
+        "strRepr": "",
     },
     "-2": {
         "opposite": "2",
         "class": "lost-KL",
         "points": 0,
+        "strRepr": "-",
     },
     "-1": {
         "opposite": "1",
         "class": "lost",
         "points": 0,
+        "strRepr": "0",
     },
     "0": {
         "opposite": "0",
         "class": "remi",
         "points": .5,
+        "strRepr": "½",
     },
     "1": {
         "opposite": "-1",
         "class": "won",
         "points": 1,
+        "strRepr": "1",
     },
     "2": {
         "opposite": "-2",
         "class": "won-KL",
         "points": 1,
+        "strRepr": "+",
     }
 }
 let FeinwertungDropdowns = []

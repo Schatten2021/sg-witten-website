@@ -177,11 +177,7 @@
                 {% endfor %}{% endif %}],
                 "KO": [{% if isinstance(cup, KOTurnier) %}{% for level in cup.levels %}
                 	[{% for game in level %}
-                        {
-                            "player1": {{ cup.teilnehmer.index(game.player1) }},
-                            "player2": {{ cup.teilnehmer.index(game.player2) }},
-                            "result": {{ game.result }},
-                        },
+                        {{ game.result }}
                     {% endfor %}],
                 {% endfor %}{% endif %}],
             },
