@@ -186,12 +186,7 @@ function sortPlayers() {
             Data.games.FFA = playerIndices.map((i) => playerIndices.map((j) => Data.games.FFA[i][j]));
             break
         case "K.O.":
-            Data.games.KO = Data.games.KO.map((layer) => layer
-                .map((value) => ({
-                    "player1": KO.getPlayerIndex(value.player1),
-                    "player2": KO.getPlayerIndex(value.player2),
-                    "result": value.result,
-                })));
+            break
     }
     renderAllPeople();
 }

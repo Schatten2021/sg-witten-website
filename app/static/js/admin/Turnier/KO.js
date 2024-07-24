@@ -34,7 +34,7 @@ const KO = {
         }
     },
     "renderTableBody": function (tbody) {
-        const playerCount = KO.totalPlayerCount();
+        const playerCount = nextPowerOfTwo(Data.players.length);
         for (let i = 0; i < Data.games.KO.length; i++) {
             const games = Data.games.KO[i];
             const row = tbody.appendChild(document.createElement("tr"));
@@ -57,14 +57,11 @@ const KO = {
                 const resultInfo = resultsDataTable[(player1 ? strReprOfGame : resultsDataTable[strReprOfGame].opposite)]
                 const element = row.appendChild(document.createElement("td"));
                 element.className = `${resultInfo.class} KO-gameInput`
-                element.innerText = resultInfo.strRepr;
+                element.innerText = resultInfo.strRepr === "" ? "/" : resultInfo.strRepr;
                 element.dataset.gameResult = game;
                 element.addEventListener("click", () => {
-                    KO.changeGameResult()
+                    KO.changeGameResult(element, i, j)
                 })
-                // const dropdown = element.children[0];
-                // dropdown.value = (player1 ? game.result : resultInfo.opposite)
-                console.debug(element)
                 // 2 ** i
                 element.colSpan = 1 << i;
             }
@@ -92,43 +89,22 @@ const KO = {
         element.className = `${resultData.class} KO-gameInput`
         element.innerText = resultData.strRepr;
     },
-    "getPlayerPoints": function (playerIndex) {
-        //TODO: This got a lot more complicated
-    },
-    "totalPlayerCount": function () {
-        const freispielCount = Data.players.reduce((previousValue, currentValue) => previousValue + (currentValue.freispiel ? 1 : 0), 0);
-        const result = nextPowerOfTwo(Data.players.length + freispielCount);
-        return result === 1 ? 2 : result;
-    },
     "getSortedPlayers": function () {
-        let playerIndices = Data.players.map((value, index) => KO.getPlayerIndex(index));
-        let sortedPlayers = [];
-        const totalElementsInSortedPlayers = KO.totalPlayerCount()
-        for (let i = 0; i < totalElementsInSortedPlayers; i++)
-            sortedPlayers.push(undefined)
-        let playersWithoutIndex = []
-        for (let i = 0; i < playerIndices.length; i++) {
-            const player = Data.players[i];
-            const index = playerIndices[i];
-            if (index === undefined)
-                playersWithoutIndex.push(player)
-            else
-                sortedPlayers[index] = player;
-        }
-        let missingPlayerIndex = 0;
-        for (let i = 0; i < sortedPlayers.length; i++) {
-            if (sortedPlayers[i] !== undefined)
-                continue
-            const player = playersWithoutIndex[missingPlayerIndex];
-            if (player === undefined)
-                continue
-            missingPlayerIndex++;
-            sortedPlayers[i] = player;
-            if (player.freispiel) {
+        const totalPlayerCount = nextPowerOfTwo(Data.players.length);
+        let players = []
+        const currentPlayers = Data.players;
+        let playerIndex = 0;
+        for (let i = 0; i < totalPlayerCount; i++) {
+            const playersToFill = totalPlayerCount - i;
+            const remainingPlayers = currentPlayers.length - playerIndex;
+            players[i] = currentPlayers[playerIndex];
+            if (playersToFill === 2 * remainingPlayers) {
+                players[i+1] = undefined;
                 i++;
             }
+            playerIndex++;
         }
-        return sortedPlayers
+        return players
     },
     "getPlayerIndex": function (currentPlayerIndex) {
         //first layer
@@ -154,61 +130,25 @@ const KO = {
         }
         return undefined;
     },
-    "getGameLayer": function (game) {
-        return Math.min(KO.getPlayerPoints(game.player1), KO.getPlayerIndex(game.player2));
-    },
     "getLayerCount": function () {
-        const playerCount = KO.totalPlayerCount();
+        const playerCount = nextPowerOfTwo(Data.players.length);
         let count = 0;
         while ((1 << count) < playerCount)
             count++;
         return count;
     },
     "updateGames": function () {
-        const allGames = Data.games.KO.flat();
-        const gamesLayers = allGames.map((game) => KO.getGameLayer(game));
-
         //generate layers
-        let layers = [];
-        for (let i = 0; i < KO.getLayerCount(); i++) {
-            layers.push([])
+        const layerCount = KO.getLayerCount();
+        for (let i = Data.games.KO.length; i < layerCount; i++) {
+            Data.games.KO.push([])
         }
-        for (let i = 0; i < allGames.length; i++) {
-            const game = allGames[i];
-            const gamesLayer = gamesLayers[i];
-            layers[gamesLayer].push(game);
-        }
-        for (let i = layers.length - 2; i > 0; i--) {
-            const layer = layers[i];
-            const layerIndices = layer.map((value, index) => index)
-            const previousLayer = layers[i+1];
-            let previousLayerPlayerIndices = {}
-            for (let j = 0; j < previousLayerPlayerIndices.length; j++) {
-                const game = previousLayer[j]
-                previousLayerPlayerIndices[game.player1] = j * 2;
-                previousLayerPlayerIndices[game.player2] = j * 2 + 1;
+        for (let i = layerCount - 1; i >= 0; i--) {
+            const gameCount = 1 << i;
+            for (let j = Data.games.KO[i].length; j < gameCount; j++) {
+                Data.games.KO[i].push(0)
             }
-            const layerTargetIndices = layer.map((game) => {
-                if (previousLayerPlayerIndices[game.player1] !== undefined)
-                    return previousLayerPlayerIndices[game.player1];
-                if (previousLayerPlayerIndices[game.player2] !== undefined)
-                    return previousLayerPlayerIndices[game.player2];
-                return undefined
-            })
-            const newLayerIndices = layerIndices.sort((i, j) => {
-                const game1Index = layerTargetIndices[i];
-                const game2Index = layerTargetIndices[j];
-                if (game1Index !== undefined && game2Index !== undefined)
-                    return game1Index - game2Index;
-                if (game1Index === undefined)
-                    return 1;
-                if (game2Index === undefined)
-                    return -1;
-                return 0;
-            })
-            layers[i] = newLayerIndices.map((j) => layer[j]);
         }
-        Data.games.KO = layers
     },
     "addPerson": function (index, rowElement) {
         KO.render()
