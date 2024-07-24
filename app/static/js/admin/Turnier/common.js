@@ -69,6 +69,9 @@ function addPerson(callback = null) {
             case "jeder gegen jeden":
                 FFA.changePerson(index, rowElement);
                 break;
+            case "K.O.":
+                KO.changePerson(index, rowElement);
+                break;
             default:
                 console.error("Unhandled cup type " + cupTypeInput.value);
                 break;

@@ -1,6 +1,7 @@
 const KO = {
     "render": function () {
         gamesDiv.innerHTML = "";
+        KO.updatePlayers();
         sortPlayers();
         KO.updateGames();
         const table = gamesDiv.appendChild(document.createElement("table"));
@@ -67,8 +68,9 @@ const KO = {
             }
         }
     },
+    // visible functionality (events, etc.)
     "changeGameResult": function (element, i, j) {
-        const gameIndex = Math.floor(j / 2);
+        const gameIndex = j >> 1;
         const player1 = (j & 1) === 0;
         if (Data.games.KO[i][gameIndex] === undefined) {
             Data.games.KO[i][gameIndex] = 0
@@ -82,12 +84,34 @@ const KO = {
             KO.setResult(otherElement, "-2");
         }
         Data.games.KO[i][gameIndex] = (player1 ? 1 : -1) * parseInt(element.dataset.gameResult);
+        KO.updatePlayers();
     },
     "setResult": function (element, result) {
         const resultData = resultsDataTable[result];
         element.dataset.gameResult = result;
         element.className = `${resultData.class} KO-gameInput`
         element.innerText = resultData.strRepr;
+    },
+    //other
+    "getPlayerPoints": function (playerIndex) {
+        let previousIndex = playerIndex;
+        for (let i = 0; i < Data.games.KO.length; i++) {
+            const gameIndex = Math.floor(previousIndex / 2);
+            const player1 = (previousIndex & 1) === 0;
+            const game = Data.games.KO[i][gameIndex];
+            const result = game !== undefined ? (player1 ? game : -game) : -1;
+            if (result <= 0)
+                return i;
+            previousIndex = gameIndex;
+        }
+        return Data.games.KO.length;
+    },
+    "updatePlayers": function () {
+        for (let i = 0; i < Data.players.length; i++) {
+            Data.players[i].points = KO.getPlayerPoints(i);
+        }
+        sortPlayers();
+        renderAllPeople();
     },
     "getSortedPlayers": function () {
         const totalPlayerCount = nextPowerOfTwo(Data.players.length);
@@ -106,30 +130,6 @@ const KO = {
         }
         return players
     },
-    "getPlayerIndex": function (currentPlayerIndex) {
-        //first layer
-        if (Data.games.KO.length === 0)
-            return undefined;
-        const games = Data.games.KO[0];
-        for (let i = 0; i < games.length; i++) {
-            const game = games[i];
-            if (game.player1 === currentPlayerIndex)
-                return i * 2;
-            if (game.player2 === currentPlayerIndex)
-                return i * 2 + 1
-        }
-        if (Data.games.KO.length === 1)
-            return undefined
-        const secondLayerGames = Data.games.KO[1];
-        for (let i = 0; i < secondLayerGames.length; i++) {
-            const game = secondLayerGames[i];
-            if (game.player1 === currentPlayerIndex)
-                return i * 4;
-            if (game.player2 === currentPlayerIndex)
-                return i * 4 + 2;
-        }
-        return undefined;
-    },
     "getLayerCount": function () {
         const playerCount = nextPowerOfTwo(Data.players.length);
         let count = 0;
@@ -143,8 +143,8 @@ const KO = {
         for (let i = Data.games.KO.length; i < layerCount; i++) {
             Data.games.KO.push([])
         }
-        for (let i = layerCount - 1; i >= 0; i--) {
-            const gameCount = 1 << i;
+        for (let i = 0; i < layerCount; i++) {
+            const gameCount = 1 << (layerCount - i - 1);
             for (let j = Data.games.KO[i].length; j < gameCount; j++) {
                 Data.games.KO[i].push(0)
             }
@@ -153,4 +153,7 @@ const KO = {
     "addPerson": function (index, rowElement) {
         KO.render()
     },
+    "changePerson": function (index, rowElement) {
+        KO.render();
+    }
 }

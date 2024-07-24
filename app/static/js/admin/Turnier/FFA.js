@@ -135,7 +135,6 @@ const FFA = {
     },
     "changePerson": function (index, row) {
         const id = row.children[1].children[0].value
-        console.debug(id)
         const name = getPlayerName(id)
         Data.players[index].id = id;
         const table = gamesDiv.children[0]
