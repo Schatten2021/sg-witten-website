@@ -15,6 +15,7 @@ const KO = {
             const player = players[i];
             const element = tr.appendChild(document.createElement("th"));
             element.scope = "col";
+            element.className = "KO-player-header"
             element.innerText = player === undefined ? "freispiel" : getPlayerName(player.id);
         }
     },
